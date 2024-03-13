@@ -1,0 +1,529 @@
+
+property PROPERTY_1_ORIGINAL_WITH_USER1
+ | Safety: user1 cannot sign up immediately after they just have.
+
+PASS
+
+property PROPERTY_2_ORIGINAL_WITH_USER2
+ | Safety: user2 cannot sign up immediately after they just have.
+
+PASS
+
+property PROPERTY_3_ORIGINAL_WITH_USER1
+ | Safety: user1 cannot sign in immediately after they just have.
+
+PASS
+
+property PROPERTY_4_ORIGINAL_WITH_USER2
+ | Safety: user2 cannot sign in immediately after they just have.
+
+PASS
+
+property PROPERTY_5_ORIGINAL_WITH_USER1
+ | Safety: user1 cannot sign out immediately after they just have.
+
+PASS
+
+property PROPERTY_6_ORIGINAL_WITH_USER2
+ | Safety: user2 cannot sign out immediately after they just have.
+
+PASS
+
+property PROPERTY_7_ORIGINAL_WITH_GENERAL_DATA
+ | Safety: A user cannot use any application functionality without being signed up or signed in.
+
+PASS
+
+property PROPERTY_7v2_USER1
+ | Safety: user 1 cannot use any application functionality without being signed up or signed in.
+
+PASS
+
+property PROPERTY_7v3_USER2
+ | Safety: user 2 cannot use any application functionality without being signed up or signed in.
+
+PASS
+
+property PROPERTY_8_ORIGINAL_WITH_GENERAL_DATA
+ | Safety: A user must have signed up inorder to have signed out.
+
+PASS
+
+property PROPERTY_8v2_USER1
+ | Safety: user 1 must have signed up inorder to have signed out.
+
+FAIL
+
+property PROPERTY_8v3_USER2
+ | Safety: user 2 must have signed up inorder to have signed out.
+
+FAIL
+
+property PROPERTY_10_ORIGINAL_WITH_GENERAL_DATA
+ | Safety: A user cannot create calendar without signing up or in.
+
+PASS
+
+property PROPERTY_10v2_USER1
+ | Safety: user 1 cannot create calendar without signing up or in.
+
+FAIL
+
+property PROPERTY_10v3_USER2
+ | Safety: user 2 cannot create calendar without signing up or in.
+
+FAIL
+
+property PROPERTY_11_ORIGINAL_WITH_GENERAL_DATA
+ | Safety: A user cannot delete calendar without signing up or in.
+
+PASS
+
+property PROPERTY_11v2_USER1
+ | Safety: user 1 cannot delete calendar without signing up or in.
+
+FAIL
+
+property PROPERTY_11v3_USER2
+ | Safety: user 2 cannot delete calendar without signing up or in.
+
+FAIL
+
+property PROPERTY_12_ORIGINAL_WITH_GENERAL_DATA
+ | Safety: A user cannot delete calendar without it being created.
+
+PASS
+
+property PROPERTY_12v2_USER1
+ | Safety: user 1 cannot delete calendar without it being created.
+
+FAIL
+
+property PROPERTY_12v3_USER2
+ | Safety: user 2 cannot delete calendar without it being created.
+
+FAIL
+
+property PROPERTY_13_ORIGINAL_WITH_GENERAL_DATA
+ | Safety: A user cannot create an event or a memo without calendar being created.
+
+PASS
+
+property PROPERTY_13v2_USER1
+ | Safety: user 1 cannot create an event or a memo without calendar being created.
+
+Demo.svl:185: warning: an error occurred during formula evaluation with evaluator4
+     see Demo.log for a detailed diagnostic
+
+FAIL
+
+property PROPERTY_13v3_USER2
+ | Safety: user 2 cannot create an event or a memo without calendar being created.
+
+Demo.svl:193: warning: an error occurred during formula evaluation with evaluator4
+     see Demo.log for a detailed diagnostic
+
+FAIL
+
+property PROPERTY_15_ORIGINAL_WITH_GENERAL_DATA
+ | Liveness: Should be able for some user to sign up followed by some user signing up immediately after.
+
+PASS
+
+property PROPERTY_15v2_USER2
+ | Liveness: Should be able for user 2 to sign up followed by user 1 signing up immediately after.
+
+PASS
+
+property PROPERTY_15v3_USER1
+ | Liveness: Should be able for user 1 to sign up followed by user 2 signing up immediately after.
+
+PASS
+
+property PROPERTY_16_ORIGINAL_WITH_GENERAL_DATA
+ | Liveness: Should be able for some user to sign in followed by some user signing in immediately after.
+
+PASS
+
+property PROPERTY_16v2_USER2
+ | Liveness: Should be able for user 2 to sign in immediately after following user 1 signing in.
+
+PASS
+
+property PROPERTY_16v3_USER1
+ | Liveness: Should be able for user 1 to immediately sign in after following user 2 signing in.
+
+PASS
+
+property PROPERTY_17_ORIGINAL_WITH_GENERAL_DATA
+ | Liveness: Should be able for some user to sign out followed by some user signing out immediately after.
+
+PASS
+
+property PROPERTY_17v2_USER2
+ | Liveness: Should be able for user 2 to sign out followed by user 1 signing out immediately after.
+
+PASS
+
+property PROPERTY_17v3_USER1
+ | Liveness: Should be able for user 1 to sign out followed by user 2 signing out immediately after.
+
+PASS
+
+property PROPERTY_20_ORIGINAL_WITH_GENERAL_DATA
+ | Liveness: Any user leads to sign up after a finite number of actions
+
+PASS
+
+property PROPERTY_20v2_USER1
+ | Liveness: user 1 leads to sign up after a finite number of actions
+
+FAIL
+
+property PROPERTY_20v3_USER2
+ | Liveness: user 2 leads to sign up after a finite number of actions
+
+FAIL
+
+property PROPERTY_21_ORIGINAL_NO_DATA
+ | Liveness: Display calendar is inevitable if user selects to view calendar.
+
+FAIL
+
+property PROPERTY_21v2_WITH_GENERAL_DATA
+ | Liveness: Display calendar is inevitable if user selects to view calendar.
+
+FAIL
+
+property PROPERTY_21v3_USER1
+ | Liveness: Display calendar 1 is inevitable if user 1 selects to view calendar 1.
+
+FAIL
+
+property PROPERTY_21v4_USER2
+ | Liveness: Display calendar 1 is inevitable if user 2 selects to view calendar 1.
+
+FAIL
+
+property PROPERTY_22_ORIGINAL_WITH_GENERAL_DATA
+ | Liveness: Display event is inevitable if user selects to view event.
+
+FAIL
+
+property PROPERTY_22v2_USER1
+ | Liveness: Display event 1 is inevitable if user 1 selects to view event 1.
+
+Demo.svl:349: warning: an error occurred during formula evaluation with evaluator4
+     see Demo.log for a detailed diagnostic
+
+FAIL
+
+property PROPERTY_22v3_USER2
+ | Liveness: Display event 1 is inevitable if user 2 selects to view event 1.
+
+Demo.svl:363: warning: an error occurred during formula evaluation with evaluator4
+     see Demo.log for a detailed diagnostic
+
+FAIL
+
+property PROPERTY_23_ORIGINAL_NO_DATA
+ | Liveness: Display memo is inevitable if user selects to view memo.
+
+FAIL
+
+property PROPERTY_23v2_WITH_GENERAL_DATA
+ | Liveness: Display memo is inevitable if user selects to view memo.
+
+FAIL
+
+property PROPERTY_23v3_USER1
+ | Liveness: Display memo 1 is inevitable if user selects 1 to view memo 1.
+
+FAIL
+
+property PROPERTY_23v4_USER2
+ | Liveness: Display memo 1 is inevitable if user selects 2 to view memo 1.
+
+FAIL
+
+property PROPERTY_24_ORIGINAL_NO_DATA
+ | Liveness: Search result is inevitably returned to user when they submit search.
+
+FAIL
+
+property PROPERTY_24v2_WITH_GENERAL_DATA
+ | Liveness: Search result is inevitably returned to user when they submit search.
+
+FAIL
+
+property PROPERTY_24v3_USER1
+ | Liveness: Search result is inevitably returned to user 1 when they submit search for event 1 in calendar 1.
+
+Demo.svl:461: warning: an error occurred during formula evaluation with evaluator4
+     see Demo.log for a detailed diagnostic
+
+FAIL
+
+property PROPERTY_24v4_USER2
+ | Liveness: Search result is inevitably returned to user 2 when they submit search for event 1 in calendar 1.
+
+Demo.svl:475: warning: an error occurred during formula evaluation with evaluator4
+     see Demo.log for a detailed diagnostic
+
+Demo.svl:475: warning: compiling "Trialx4final.lnt" generated errors or warnings
+     messages are reported in file "Trialx4final.err#0"
+
+FAIL
+
+property PROPERTY_25_ORIGINAL_WITH_GENERAL_DATA
+ | Fairness: After user completes signing up it is fairly possible to sign out*.
+
+Demo.svl:489: warning: compiling "Trialx4final.lnt" generated errors or warnings
+     messages are reported in file "Trialx4final.err#1"
+
+FAIL
+
+property PROPERTY_26_ORIGINAL_WITH_DATA_USER1
+ | Fairness: After user1 completes signing up it is fairly possible to sign out*.
+
+Demo.svl:500: warning: an error occurred during formula evaluation with evaluator4
+     see Demo.log for a detailed diagnostic
+
+FAIL
+
+property PROPERTY_26a_USER1
+ | Fairness: After user1 completes signing up it is fairly possible to sign out*.
+
+PASS
+
+property PROPERTY_27_ORIGINAL_WITH_DATA_USER2
+ | Fairness: After user2 completes signing up it is fairly possible to sign out*.
+
+FAIL
+
+property PROPERTY_27a_USER2
+ | Fairness: After user2 completes signing up it is fairly possible to sign out*.
+
+PASS
+
+property PROPERTY_28_ORIGINAL_WITH_GENERAL_DATA
+ | Fairness: After user completes signing in it is fairly possible to sign out*.
+
+FAIL
+
+property PROPERTY_28a_WITH_GENERAL_DATA
+ | Fairness: After user completes signing in it is fairly possible to sign out*.
+
+PASS
+
+property PROPERTY_29_ORIGINAL_WITH_DATA_USER1
+ | Fairness: After user1 completes signing in it is fairly possible to sign out*.
+
+FAIL
+
+property PROPERTY_29a_USER1
+ | Fairness: After user1 completes signing in it is fairly possible to sign out*.
+
+PASS
+
+property PROPERTY_29b_USER1
+ | Fairness: After user1 completes signing in it is fairly possible to sign out*.
+
+Demo.svl:576: warning: an error occurred during formula evaluation with evaluator4
+     see Demo.log for a detailed diagnostic
+
+FAIL
+
+property PROPERTY_30_ORIGINAL_WITH_DATA_USER2
+ | Fairness: After user2 completes signing in it is fairly possible to sign out*.
+
+Demo.svl:584: warning: an error occurred during formula evaluation with evaluator4
+     see Demo.log for a detailed diagnostic
+
+FAIL
+
+property PROPERTY_30a_USER2
+ | Fairness: After user2 completes signing in it is fairly possible to sign out*.
+
+FAIL
+
+property PROPERTY_30b_USER2
+ | Fairness: After user2 completes signing in it is fairly possible to sign out*.
+
+Demo.svl:603: warning: an error occurred during formula evaluation with evaluator4
+     see Demo.log for a detailed diagnostic
+
+FAIL
+
+property PROPERTY_31_ORIGINAL_NO_DATA
+ | Fairness: After sending a chat, all fair execution sequences will lead to a calendar notification.
+
+FAIL
+
+property PROPERTY_31v2_WITH_GENERAL_DATA
+ | Fairness: After sending a chat, all fair execution sequences will lead to a calendar notification.
+
+FAIL
+
+property PROPERTY_31v3_USER1
+ | Fairness: After user 1 sends a chat to calendar 1, all fair execution sequences will lead to a calendar 1 notification.
+
+FAIL
+
+property PROPERTY_31v4_USER2
+ | Fairness: After user 2 sends a chat to calendar 1, all fair execution sequences will lead to a calendar 1 notification.
+
+FAIL
+
+property PROPERTY_32_ORIGINAL_NO_DATA
+ | Fairness: After creating an event, deleting an event, changing the date and time of an event or commenting on an event all fair execution sequences will lead to an event nofication and the event update being reflected in activity.
+
+FAIL
+
+property PROPERTY_32v2_WITH_GENERAL_DATA
+ | Fairness: After creating an event, deleting an event, changing the date and time of an event or commenting on an event all fair execution sequences will lead to an event nofication and the event update being reflected in activity.
+
+FAIL
+
+property PROPERTY_32v3_USER1
+ | Fairness: After user 1 creates event 1, deletes event 1, changes the date and time of event 1 or comments on event 1 all fair execution sequences will lead to an event nofication and the event update being reflected in activity.
+
+Demo.svl:659: warning: an error occurred during formula evaluation with evaluator4
+     see Demo.log for a detailed diagnostic
+
+FAIL
+
+property PROPERTY_32v4_USER2
+ | Fairness: After user 2 creates event 1, deletes event 1, changes the date and time of event 1 or comments on event 1 all fair execution sequences will lead to an event nofication and the event update being reflected in activity.
+
+Demo.svl:667: warning: an error occurred during formula evaluation with evaluator4
+     see Demo.log for a detailed diagnostic
+
+FAIL
+
+property PROPERTY_33_ORIGINAL_NO_DATA
+ | Fairness: After creating a memo, deleting an memo, or commenting on a memo all fair execution sequences will lead to a memo nofication and the memo update being reflected in activity.
+
+FAIL
+
+property PROPERTY_33v2_WITH_GENERAL_DATA
+ | Fairness: After creating a memo, deleting an memo, or commenting on a memo all fair execution sequences will lead to a memo nofication and the memo update being reflected in activity.
+
+Demo.svl:683: warning: an error occurred during formula evaluation with evaluator4
+     see Demo.log for a detailed diagnostic
+
+FAIL
+
+property PROPERTY_33v3_USER1
+ | Fairness: After user 1 creates memo 1, deletes memo 1, or comments on memo 1 all fair execution sequences will lead to a memo nofication and the memo update being reflected in activity.
+
+Demo.svl:691: warning: an error occurred during formula evaluation with evaluator4
+     see Demo.log for a detailed diagnostic
+
+FAIL
+
+property PROPERTY_33v3_USER2
+ | Fairness: After user 2 creates memo 1, deletes memo 1, or comments on memo 1 all fair execution sequences will lead to a memo nofication and the memo update being reflected in activity.
+
+Demo.svl:699: warning: an error occurred during formula evaluation with evaluator4
+     see Demo.log for a detailed diagnostic
+
+FAIL
+
+property PROPERTY_34_ORIGINAL_NO_DATA
+ | Fairness: After a user completes creating a calendar or joining a calendar all fair execution sequences will lead to the user being added to the calendar.
+
+PASS
+
+property PROPERTY_34v2_WITH_GENERAL_DATA
+ | Fairness: After a user completes creating calendar 1 or joining a calendar 1 all fair execution sequences will lead to the user being added to the calendar.
+
+FAIL
+
+property PROPERTY_34v3_USER1
+ | Fairness: After user 1 completes creating calendar 1 or joining calendar 1 all fair execution sequences will lead to the user being added to the calendar.
+
+FAIL
+
+property PROPERTY_34v4_USER2
+ | Fairness: After user 2 completes creating calendar 1 or joining calendar 1 all fair execution sequences will lead to the user being added to the calendar.
+
+FAIL
+
+property PROPERTY_37_ORIGINAL_WITH_GENERAL_DATA
+ | Safety: A user cannot comment on an event before it has been created.
+
+FAIL
+
+property PROPERTY_37v2_USER1
+ | Safety: user 1 cannot comment on event 1 before it has been created.
+
+Demo.svl:749: warning: an error occurred during formula evaluation with evaluator4
+     see Demo.log for a detailed diagnostic
+
+FAIL
+
+property PROPERTY_37v3_USER2
+ | Safety: user 2 cannot comment on event 1 before it has been created.
+
+Demo.svl:759: warning: an error occurred during formula evaluation with evaluator4
+     see Demo.log for a detailed diagnostic
+
+FAIL
+
+property PROPERTY_38_ORIGINAL_WITH_GENERAL_DATA
+ | Safety: A user cannot change the date or time of an event before it has been created.
+
+FAIL
+
+property PROPERTY_38v2_USER1
+ | Safety: user 1 cannot change the date or time of event 1 before it has been created.
+
+Demo.svl:779: warning: an error occurred during formula evaluation with evaluator4
+     see Demo.log for a detailed diagnostic
+
+FAIL
+
+property PROPERTY_38v3_USER2
+ | Safety: user 2 cannot change the date or time of event 1 before it has been created.
+
+Demo.svl:789: warning: an error occurred during formula evaluation with evaluator4
+     see Demo.log for a detailed diagnostic
+
+FAIL
+
+property PROPERTY_9_ORIGINAL_WITH_GENERAL_DATA
+ | Safety: A user must signout in order to have signed in.
+
+FAIL
+
+property PROPERTY_9v2_USER1
+ | Safety: user 1 must signout in order to have signed in.
+
+FAIL
+
+property PROPERTY_9v3_USER2
+ | Safety: user 2 must signout in order to have signed in.
+
+FAIL
+
+property PROPERTY_14_ORIGINAL
+ | Liveness: Timetree is deadlock free; there should always be some action occuring.
+
+Demo.svl:829: warning: an error occurred during formula evaluation with evaluator4
+     see Demo.log for a detailed diagnostic
+
+FAIL
+
+property PROPERTY_18_ORIGINAL_WITH_USER1
+ | Liveness: User1 can potentially create a calendar after signing up or in.
+
+PASS
+
+property PROPERTY_19_ORIGINAL_WITH_USER2
+ | Liveness: User2 can potentially create a calendar after signing up or in.
+
+PASS
+
+property PROPERTY_35_ORGINAL_WITH_GENERAL_DATA
+ | Safety: A user cannot comment on a memo before it has been created.
