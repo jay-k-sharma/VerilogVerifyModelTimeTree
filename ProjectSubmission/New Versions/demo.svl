@@ -1,0 +1,945 @@
+property PROPERTY_1_ORIGINAL_WITH_USER1 "Safety: user1 cannot sign up immediately after they just have." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [({SIGNUP !1}.{SIGNUP !1})] false;
+    expected TRUE;
+end property
+
+property PROPERTY_2_ORIGINAL_WITH_USER2 "Safety: user2 cannot sign up immediately after they just have." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [({SIGNUP !2}.{SIGNUP !2})] false;
+    expected TRUE;
+end property
+
+property PROPERTY_3_ORIGINAL_WITH_USER1 "Safety: user1 cannot sign in immediately after they just have." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [({SIGNIN !1}.{SIGNIN !1})] false;
+    expected TRUE;
+end property
+
+property PROPERTY_4_ORIGINAL_WITH_USER2 "Safety: user2 cannot sign in immediately after they just have." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [({SIGNIN !2}.{SIGNIN !2})] false;
+    expected TRUE;
+end property
+
+property PROPERTY_5_ORIGINAL_WITH_USER1 "Safety: user1 cannot sign out immediately after they just have." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [({SIGNOUT !1}.{SIGNOUT !1})] false;
+    expected TRUE;
+end property
+
+property PROPERTY_6_ORIGINAL_WITH_USER2 "Safety: user2 cannot sign out immediately after they just have." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [({SIGNOUT !2}.{SIGNOUT !2})] false;
+    expected TRUE;
+end property
+
+property PROPERTY_7_ORIGINAL_WITH_GENERAL_DATA "Safety: A user cannot use any application functionality without being signed up or signed in." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [false.(not({SIGNUP ...} or {SIGNIN ...}))*.true*] false;
+    expected TRUE;
+end property
+
+property PROPERTY_7v2_USER1 "Safety: user 1 cannot use any application functionality without being signed up or signed in." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [false.(not({SIGNUP !1} or {SIGNIN !1}))*.true*] false;
+    expected TRUE;
+end property
+
+property PROPERTY_7v3_USER2 "Safety: user 2 cannot use any application functionality without being signed up or signed in." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [false.(not({SIGNUP !2} or {SIGNIN !2}))*.true*] false;
+    expected TRUE;
+end property
+
+property PROPERTY_8_ORIGINAL_WITH_GENERAL_DATA "Safety: A user must have signed up inorder to have signed out." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+    macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+    NOT_1_BEFORE_2({SIGNOUT...},{SIGNUP...});
+    expected TRUE;
+end property
+
+property PROPERTY_8v2_USER1 "Safety: user 1 must have signed up inorder to have signed out." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+    macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+    NOT_1_BEFORE_2({SIGNOUT !1},{SIGNUP !1});
+    expected TRUE;
+end property
+
+property PROPERTY_8v3_USER2 "Safety: user 2 must have signed up inorder to have signed out." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+    macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+    NOT_1_BEFORE_2({SIGNOUT !2},{SIGNUP !2});
+    expected TRUE;
+end property
+
+property PROPERTY_10_ORIGINAL_WITH_GENERAL_DATA  "Safety: A user cannot create calendar without signing up or in." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [(not({SIGNUP ...} or {SIGNIN ...}))*.{CREATECALENDAR ...}] false;
+    expected TRUE;
+end property
+
+property PROPERTY_10v2_USER1 "Safety: user 1 cannot create calendar without signing up or in." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [(not({SIGNUP !1} or {SIGNIN !1}))*.{CREATECALENDAR !1 !1}] false;
+    expected TRUE;
+end property
+
+property PROPERTY_10v3_USER2 "Safety: user 2 cannot create calendar without signing up or in." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [(not({SIGNUP !2} or {SIGNIN !2}))*.{CREATECALENDAR !2 !1}] false;
+    expected TRUE;
+end property
+
+property PROPERTY_11_ORIGINAL_WITH_GENERAL_DATA  "Safety: A user cannot delete calendar without signing up or in." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [(not({SIGNUP ...} or {SIGNIN ...}))*.{DELETECALENDAR ...}] false;
+    expected TRUE;
+end property
+
+property PROPERTY_11v2_USER1 "Safety: user 1 cannot delete calendar without signing up or in." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [(not({SIGNUP !1} or {SIGNIN !1}))*.{DELETECALENDAR !1 !1}] false;
+    expected TRUE;
+end property
+
+property PROPERTY_11v3_USER2 "Safety: user 2 cannot delete calendar without signing up or in." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [(not({SIGNUP !2} or {SIGNIN !2}))*.{DELETECALENDAR !2 !1}] false;
+    expected TRUE;
+end property
+
+property PROPERTY_12_ORIGINAL_WITH_GENERAL_DATA  "Safety: A user cannot delete calendar without it being created." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [(not({CREATECALENDAR ...}))*.{DELETECALENDAR ...}] false;
+    expected TRUE;
+end property
+
+property PROPERTY_12v2_USER1 "Safety: user 1 cannot delete calendar without it being created." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [(not({CREATECALENDAR !1 !1}))*.{DELETECALENDAR !1 !1}] false;
+    expected TRUE;
+end property
+
+property PROPERTY_12v3_USER2 "Safety: user 2 cannot delete calendar without it being created." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [(not({CREATECALENDAR !2 !1}))*.{DELETECALENDAR !2 !1}] false;
+    expected TRUE;
+end property
+
+property PROPERTY_13_ORIGINAL_WITH_GENERAL_DATA  "Safety: A user cannot create an event or a memo without calendar being created." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [(not({CREATECALENDAR ...}))*.({CREATEEVENT ...} or {CREATEMEMO ...})] false;
+    expected TRUE;
+end property
+
+property PROPERTY_13v2_USER1 "Safety: user 1 cannot create an event or a memo without calendar being created." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [(not({CREATECALENDAR !1 !1}))*.({CREATEEVENT !1 !1 !EVENT (1, 0, 0, 0, 0)} or {CREATEMEMO !1 !1 !1})] false;
+    expected TRUE;
+end property
+
+property PROPERTY_13v3_USER2 "Safety: user 2 cannot create an event or a memo without calendar being created." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [(not({CREATECALENDAR !2 !1}))*.({CREATEEVENT !2 !1 !EVENT (1, 0, 0, 0, 0)} or {CREATEMEMO !2 !1 !1})] false;
+    expected TRUE;
+end property
+
+property PROPERTY_15_ORIGINAL_WITH_GENERAL_DATA "Liveness: Should be able for some user to sign up followed by some user signing up immediately after." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <({SIGNUP ...}.{SIGNUP ...})> true;
+    expected TRUE;
+end property
+
+property PROPERTY_15v2_USER2 "Liveness: Should be able for user 2 to sign up followed by user 1 signing up immediately after." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <({SIGNUP !1}.{SIGNUP !2})> true;
+    expected TRUE;
+end property
+
+property PROPERTY_15v3_USER1 "Liveness: Should be able for user 1 to sign up followed by user 2 signing up immediately after." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <({SIGNUP !2}.{SIGNUP !1})> true;
+    expected TRUE;
+end property
+
+property PROPERTY_16_ORIGINAL_WITH_GENERAL_DATA "Liveness: Should be able for some user to sign in followed by some user signing in immediately after." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <(true*.{SIGNIN ...}.{SIGNIN ...})> true;
+    expected TRUE;
+end property
+
+property PROPERTY_16v2_USER2 "Liveness: Should be able for user 2 to sign in immediately after following user 1 signing in." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <(true*.{SIGNIN !1}.{SIGNIN !2})> true;
+    expected TRUE;
+end property
+
+property PROPERTY_16v3_USER1 "Liveness: Should be able for user 1 to immediately sign in after following user 2 signing in." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <(true*.{SIGNIN !2}.{SIGNIN !1})> true;
+    expected TRUE;
+end property
+
+property PROPERTY_17_ORIGINAL_WITH_GENERAL_DATA "Liveness: Should be able for some user to sign out followed by some user signing out immediately after." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <(true*.{SIGNOUT ...}.{SIGNOUT ...})> true;
+    expected TRUE;
+end property
+
+property PROPERTY_17v2_USER2 "Liveness: Should be able for user 2 to sign out followed by user 1 signing out immediately after." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <(true*.{SIGNOUT !1}.{SIGNOUT !2})> true;
+    expected TRUE;
+end property
+
+property PROPERTY_17v3_USER1 "Liveness: Should be able for user 1 to sign out followed by user 2 signing out immediately after." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <(true*.{SIGNOUT !2}.{SIGNOUT !1})> true;
+    expected TRUE;
+end property
+
+property PROPERTY_20_ORIGINAL_WITH_GENERAL_DATA "Liveness: Any user leads to sign up after a finite number of actions" is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    mu X . ((< ({SIGNUP ...}) > true or < not ({SIGNUP ...}) > X) and [ not ({SIGNUP ...}) ] X);
+    expected TRUE;
+end property
+
+property PROPERTY_20v2_USER1 "Liveness: user 1 leads to sign up after a finite number of actions" is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    mu X . ((< ({SIGNUP !1}) > true or < not ({SIGNUP !1}) > X) and [ not ({SIGNUP !1}) ] X);
+    expected TRUE;
+end property
+
+property PROPERTY_20v3_USER2 "Liveness: user 2 leads to sign up after a finite number of actions" is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    mu X . ((< ({SIGNUP !2}) > true or < not ({SIGNUP !2}) > X) and [ not ({SIGNUP !2}) ] X);
+    expected TRUE;
+end property
+
+property PROPERTY_21_ORIGINAL_NO_DATA "Liveness: Display calendar is inevitable if user selects to view calendar." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro INEVITABLE (A) =
+    mu X . ((< (A) > true or < not (A) > X) and [ not (A) ] X)
+    end_macro
+    macro AFTER_1_INEVITABLE_2 (A, B) =
+    [ true* . (A) ] INEVITABLE (B)
+    end_macro
+    AFTER_1_INEVITABLE_2({VIEWCALENDAR ...}, ({SIGNUP ...} or {SIGNIN ...} or {SIGNOUT ...} or {SIGNOUT ...} or {DISPLAYCALENDAR ...}));
+    expected TRUE;
+end property
+
+property PROPERTY_21v2_WITH_GENERAL_DATA "Liveness: Display calendar is inevitable if user selects to view calendar." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [true*.({VIEWCALENDAR ...}).({SIGNUP ...} or {SIGNIN ...} or {SIGNOUT ...} or {DISPLAYCALENDAR ...})] true;
+    expected TRUE;
+end property
+
+property PROPERTY_21v3_USER1 "Liveness: Display calendar 1 is inevitable if user 1 selects to view calendar 1." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [true*.({VIEWCALENDAR !1 !1}).({SIGNUP !1} or {SIGNIN !1} or {SIGNOUT !1} or {DISPLAYCALENDAR !1 !1})] true;
+    expected TRUE;
+end property
+
+property PROPERTY_21v4_USER2 "Liveness: Display calendar 1 is inevitable if user 2 selects to view calendar 1." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [true*.({VIEWCALENDAR !2 !1}).({SIGNUP !2} or {SIGNIN !2} or {SIGNOUT !2} or {DISPLAYCALENDAR !2 !1})] true;
+    expected TRUE;
+end property
+
+property PROPERTY_22_ORIGINAL_WITH_GENERAL_DATA "Liveness: Display event is inevitable if user selects to view event." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro INEVITABLE (A) =
+    mu X . ((< (A) > true or < not (A) > X) and [ not (A) ] X)
+    end_macro
+    macro AFTER_1_INEVITABLE_2 (A, B) =
+    [ true* . (A) ] INEVITABLE (B)
+    end_macro
+    AFTER_1_INEVITABLE_2({VIEWEVENT ...}, {DISPLAYEVENT ...});
+    expected TRUE;
+end property
+
+property PROPERTY_22v2_USER1 "Liveness: Display event 1 is inevitable if user 1 selects to view event 1." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro INEVITABLE (A) =
+    mu X . ((< (A) > true or < not (A) > X) and [ not (A) ] X)
+    end_macro
+    macro AFTER_1_INEVITABLE_2 (A, B) =
+    [ true* . (A) ] INEVITABLE (B)
+    end_macro
+    AFTER_1_INEVITABLE_2({VIEWEVENT !1 !1 !1}, {DISPLAYEVENT !1 !1 !EVENT (1, 0, 0, 0, 0)});
+    expected TRUE;
+end property
+
+property PROPERTY_22v3_USER2 "Liveness: Display event 1 is inevitable if user 2 selects to view event 1." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro INEVITABLE (A) =
+    mu X . ((< (A) > true or < not (A) > X) and [ not (A) ] X)
+    end_macro
+    macro AFTER_1_INEVITABLE_2 (A, B) =
+    [ true* . (A) ] INEVITABLE (B)
+    end_macro
+    AFTER_1_INEVITABLE_2({VIEWEVENT !2 !1 !1}, {DISPLAYEVENT !2 !1 !EVENT (1, 0, 0, 0, 0)});
+    expected TRUE;
+end property
+
+property PROPERTY_23_ORIGINAL_NO_DATA "Liveness: Display memo is inevitable if user selects to view memo." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro INEVITABLE (A) =
+    mu X . ((< (A) > true or < not (A) > X) and [ not (A) ] X)
+    end_macro
+    macro AFTER_1_INEVITABLE_2 (A, B) =
+    [ true* . (A) ] INEVITABLE (B)
+    end_macro
+    AFTER_1_INEVITABLE_2(VIEWMEMO, DISPLAYMEMO);
+    expected TRUE;
+end property
+
+property PROPERTY_23v2_WITH_GENERAL_DATA "Liveness: Display memo is inevitable if user selects to view memo." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro INEVITABLE (A) =
+    mu X . ((< (A) > true or < not (A) > X) and [ not (A) ] X)
+    end_macro
+    macro AFTER_1_INEVITABLE_2 (A, B) =
+    [ true* . (A) ] INEVITABLE (B)
+    end_macro
+    AFTER_1_INEVITABLE_2({VIEWMEMO ...}, {DISPLAYMEMO ...});
+    expected TRUE;
+end property
+
+property PROPERTY_23v3_USER1 "Liveness: Display memo 1 is inevitable if user selects 1 to view memo 1." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro INEVITABLE (A) =
+    mu X . ((< (A) > true or < not (A) > X) and [ not (A) ] X)
+    end_macro
+    macro AFTER_1_INEVITABLE_2 (A, B) =
+    [ true* . (A) ] INEVITABLE (B)
+    end_macro
+    AFTER_1_INEVITABLE_2({VIEWMEMO !1 !1 !1}, {DISPLAYMEMO !1 !1 !1});
+    expected TRUE;
+end property
+
+property PROPERTY_23v4_USER2 "Liveness: Display memo 1 is inevitable if user selects 2 to view memo 1." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro INEVITABLE (A) =
+    mu X . ((< (A) > true or < not (A) > X) and [ not (A) ] X)
+    end_macro
+    macro AFTER_1_INEVITABLE_2 (A, B) =
+    [ true* . (A) ] INEVITABLE (B)
+    end_macro
+    AFTER_1_INEVITABLE_2({VIEWMEMO !2 !1 !1}, {DISPLAYMEMO !2 !1 !1});
+    expected TRUE;
+end property
+
+property PROPERTY_24_ORIGINAL_NO_DATA "Liveness: Search result is inevitably returned to user when they submit search." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro INEVITABLE (A) =
+    mu X . ((< (A) > true or < not (A) > X) and [ not (A) ] X)
+    end_macro
+    macro AFTER_1_INEVITABLE_2 (A, B) =
+    [ true* . (A) ] INEVITABLE (B)
+    end_macro
+    AFTER_1_INEVITABLE_2(SEARCH, RESULT);
+    expected TRUE;
+end property
+
+property PROPERTY_24v2_WITH_GENERAL_DATA "Liveness: Search result is inevitably returned to user when they submit search." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro INEVITABLE (A) =
+    mu X . ((< (A) > true or < not (A) > X) and [ not (A) ] X)
+    end_macro
+    macro AFTER_1_INEVITABLE_2 (A, B) =
+    [ true* . (A) ] INEVITABLE (B)
+    end_macro
+    AFTER_1_INEVITABLE_2({SEARCH ...}, {RESULT ...});
+    expected TRUE;
+end property
+
+property PROPERTY_24v3_USER1 "Liveness: Search result is inevitably returned to user 1 when they submit search for event 1 in calendar 1." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro INEVITABLE (A) =
+    mu X . ((< (A) > true or < not (A) > X) and [ not (A) ] X)
+    end_macro
+    macro AFTER_1_INEVITABLE_2 (A, B) =
+    [ true* . (A) ] INEVITABLE (B)
+    end_macro
+    AFTER_1_INEVITABLE_2({SEARCH !1 !1 !1}, ({RESULT !1 !1 !EVENT (1, 0, 0, 0, 0)} or {RESULT !1 !1 !EVENT (1, 13, 24, 8, 18)}));
+    expected TRUE;
+end property
+
+property PROPERTY_24v4_USER2 "Liveness: Search result is inevitably returned to user 2 when they submit search for event 1 in calendar 1." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro INEVITABLE (A) =
+    mu X . ((< (A) > true or < not (A) > X) and [ not (A) ] X)
+    end_macro
+    macro AFTER_1_INEVITABLE_2 (A, B) =
+    [ true* . (A) ] INEVITABLE (B)
+    end_macro
+    AFTER_1_INEVITABLE_2({SEARCH !2 !1 !1}, ({RESULT !2 !1 !EVENT (1, 0, 0, 0, 0)} or {RESULT !2 !1 !EVENT (1, 13, 24, 8, 18)}));
+    expected TRUE;
+end property
+
+property PROPERTY_25_ORIGINAL_WITH_GENERAL_DATA "Fairness: After user completes signing up it is fairly possible to sign out*." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro SOME (R) = < (R) > true end_macro
+    macro FAIRLY (A) =   [ (not (A))* ] SOME (true* . (A)) end_macro
+    macro AFTER_1_FAIRLY_2 (A, B) =  [ true* . (A) ] FAIRLY (B) end_macro
+    AFTER_1_FAIRLY_2 ({SIGNUP ...}, {SIGNOUT ...});
+    expected TRUE;
+end property
+
+property PROPERTY_26_ORIGINAL_WITH_DATA_USER1 "Fairness: After user1 completes signing up it is fairly possible to sign out*." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro SOME (R) = < (R) > true end_macro
+    macro FAIRLY (A) =   [ (not (A))* ] SOME (true* . (A)) end_macro
+    macro AFTER_1_FAIRLY_2 (A, B) =  [ true* . (A) ] FAIRLY (B) end_macro
+    AFTER_1_FAIRLY_2 ({SIGNUP !1}, {SIGNOUT !1});
+    expected TRUE;
+end property
+
+property PROPERTY_26a_USER1 "Fairness: After user1 completes signing up it is fairly possible to sign out*." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <({SIGNUP !1}.true*.{SIGNOUT !1})> true;
+    expected TRUE;
+end property
+
+property PROPERTY_27_ORIGINAL_WITH_DATA_USER2 "Fairness: After user2 completes signing up it is fairly possible to sign out*." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro SOME (R) = < (R) > true end_macro
+    macro FAIRLY (A) =   [ (not (A))* ] SOME (true* . (A)) end_macro
+    macro AFTER_1_FAIRLY_2 (A, B) =  [ true* . (A) ] FAIRLY (B) end_macro
+    AFTER_1_FAIRLY_2 ({SIGNUP !2}, {SIGNOUT !2});
+    expected TRUE;
+end property
+
+property PROPERTY_27a_USER2 "Fairness: After user2 completes signing up it is fairly possible to sign out*." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <({SIGNUP !2}.true*.{SIGNOUT !2})> true;
+    expected TRUE;
+end property
+
+property PROPERTY_28_ORIGINAL_WITH_GENERAL_DATA "Fairness: After user completes signing in it is fairly possible to sign out*." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro SOME (R) = < (R) > true end_macro
+    macro FAIRLY (A) =   [ (not (A))* ] SOME (true* . (A)) end_macro
+    macro AFTER_1_FAIRLY_2 (A, B) =  [ true* . (A) ] FAIRLY (B) end_macro
+    AFTER_1_FAIRLY_2 ({SIGNIN ...}, {SIGNOUT ...});
+    expected TRUE;
+end property
+
+property PROPERTY_28a_WITH_GENERAL_DATA"Fairness: After user completes signing in it is fairly possible to sign out*." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <(true*.{SIGNIN ...}.true*.{SIGNOUT ...})> true;
+    expected TRUE;
+end property
+
+property PROPERTY_29_ORIGINAL_WITH_DATA_USER1 "Fairness: After user1 completes signing in it is fairly possible to sign out*." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro SOME (R) = < (R) > true end_macro
+    macro FAIRLY (A) =   [ (not (A))* ] SOME (true* . (A)) end_macro
+    macro AFTER_1_FAIRLY_2 (A, B) =  [ true* . (A) ] FAIRLY (B) end_macro
+    AFTER_1_FAIRLY_2 ({SIGNIN !1}, {SIGNOUT !1});
+    expected TRUE;
+end property
+
+property PROPERTY_29a_USER1 "Fairness: After user1 completes signing in it is fairly possible to sign out*." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <(true*.{SIGNIN !1}.true*.{SIGNOUT !1})> true;
+    expected TRUE;
+end property
+
+property PROPERTY_29b_USER1 "Fairness: After user1 completes signing in it is fairly possible to sign out*." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [true*.{SIGNIN !1}.(not ({SIGNOUT !1})*]<true*.({SIGNOUT !1})> true;
+    expected TRUE;
+end property
+
+property PROPERTY_30_ORIGINAL_WITH_DATA_USER2 "Fairness: After user2 completes signing in it is fairly possible to sign out*." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro SOME (R) = < (R) > true end_macro
+    macro FAIRLY (A) =   [ (not (A))* ] SOME (true* . (A)) end_macro
+    macro AFTER_1_FAIRLY_2 (A, B) =  [ true* . (A) ] FAIRLY (B) end_macro
+    AFTER_1_FAIRLY_2 ({SIGNIN !2}, {SIGNOUT !2});
+    expected TRUE;
+end property
+
+property PROPERTY_30a_USER2 "Fairness: After user2 completes signing in it is fairly possible to sign out*." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <(true*.{SIGNIN !2}.true*.{SIGNOUT !2})> true;
+    expected TRUE;
+end property
+
+property PROPERTY_30b_USER2 "Fairness: After user2 completes signing in it is fairly possible to sign out*." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [true*.{SIGNIN !2}.(not ({SIGNOUT !2})*]<true*.({SIGNOUT !2})> true;
+    expected TRUE;
+end property
+
+property PROPERTY_31_ORIGINAL_NO_DATA "Fairness: After sending a chat, all fair execution sequences will lead to a calendar notification." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [true*.CHAT.(not(CALENDARNOTIFY))*]<true*.(CALENDARNOTIFY)>true;
+    expected TRUE;
+end property
+
+property PROPERTY_31v2_WITH_GENERAL_DATA "Fairness: After sending a chat, all fair execution sequences will lead to a calendar notification." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <(true*.({CHAT ...}).true*.({CALENDARNOTIFY ...}).true*)> false;
+    expected TRUE;
+end property
+
+property PROPERTY_31v3_USER1 "Fairness: After user 1 sends a chat to calendar 1, all fair execution sequences will lead to a calendar 1 notification." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <(true*.({CHAT !1 !1 !1}).true*.({CALENDARNOTIFY !2 !1 !1}).true*)> false;
+    expected TRUE;
+end property
+
+property PROPERTY_31v4_USER2 "Fairness: After user 2 sends a chat to calendar 1, all fair execution sequences will lead to a calendar 1 notification." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <(true*.({CHAT !2 !1 !1}).true*.({CALENDARNOTIFY !1 !1 !1}).true*)> false;
+    expected TRUE;
+end property
+
+property PROPERTY_32_ORIGINAL_NO_DATA "Fairness: After creating an event, deleting an event, changing the date and time of an event or commenting on an event all fair execution sequences will lead to an event nofication and the event update being reflected in activity." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [true*.(CREATEEVENT or DELETEEVENT or CHANGEEVENTDATEANDTIME or COMMENTONEVENT).(not(EVENTNOTIFY and EVENTACTIVITYUPDATE))*]<true*.(EVENTNOTIFY and EVENTACTIVITYUPDATE)>true;
+    expected TRUE;
+end property
+
+property PROPERTY_32v2_WITH_GENERAL_DATA "Fairness: After creating an event, deleting an event, changing the date and time of an event or commenting on an event all fair execution sequences will lead to an event nofication and the event update being reflected in activity." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <(true*.({CREATEEVENT ...} or {DELETEEVENT ...} or {CHANGEEVENTDATEANDTIME ...} or {COMMENTONEVENT ...}).true*.({EVENTNOTIFY ...} and {EVENTACTIVITYUPDATE ...}))> true;
+    expected TRUE;
+end property
+
+property PROPERTY_32v3_USER1 "Fairness: After user 1 creates event 1, deletes event 1, changes the date and time of event 1 or comments on event 1 all fair execution sequences will lead to an event nofication and the event update being reflected in activity." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <(true*.({CREATEEVENT !1 !1 !EVENT (1, 0, 0, 0, 0)} or {DELETEEVENT !1 !1 !1} or {CHANGEEVENTDATEANDTIME !1 !1 !EVENT (1, 13, 24, 8, 18)} or {COMMENTONEVENT !1 !1 !1 !"1"}).true*.({EVENTNOTIFY ...} and {EVENTACTIVITYUPDATE ...}))> true;
+    expected TRUE;
+end property
+
+property PROPERTY_32v4_USER2 "Fairness: After user 2 creates event 1, deletes event 1, changes the date and time of event 1 or comments on event 1 all fair execution sequences will lead to an event nofication and the event update being reflected in activity." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <(true*.({CREATEEVENT !2 !1 !EVENT (1, 0, 0, 0, 0)} or {DELETEEVENT !2 !1 !1} or {CHANGEEVENTDATEANDTIME !2 !1 !EVENT (1, 13, 24, 8, 18)} or {COMMENTONEVENT !2 !1 !1 !"1"}).true*.({EVENTNOTIFY ...} and {EVENTACTIVITYUPDATE ...}))> true;
+    expected TRUE;
+end property
+
+property PROPERTY_33_ORIGINAL_NO_DATA "Fairness: After creating a memo, deleting an memo, or commenting on a memo all fair execution sequences will lead to a memo nofication and the memo update being reflected in activity." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [true*.(CREATEMEMO or DELETEMEMO or COMMENTONMEMO).(not(MEMONOTIFY and MEMOACTIVITYUPDATE))*]<true*.(MEMONOTIFY and MEMOACTIVITYUPDATE)>true;
+    expected TRUE;
+end property
+
+property PROPERTY_33v2_WITH_GENERAL_DATA "Fairness: After creating a memo, deleting an memo, or commenting on a memo all fair execution sequences will lead to a memo nofication and the memo update being reflected in activity." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <true*.({CREATEMEMO ...} or {DELETEMEMO ...} or {COMMENTONMEMO ...}).true*.({MEMONOTIFY ...} and {MEMOACTIVITYUPDATE ...}))>true;
+    expected TRUE;
+end property
+
+property PROPERTY_33v3_USER1 "Fairness: After user 1 creates memo 1, deletes memo 1, or comments on memo 1 all fair execution sequences will lead to a memo nofication and the memo update being reflected in activity." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <true*.({CREATEMEMO !1 !1 !1} or {DELETEMEMO !1 !1 !1} or {COMMENTONMEMO !1 !1 !1 !"1"}).true*.({MEMONOTIFY ...} and {MEMOACTIVITYUPDATE ...}))>true;
+    expected TRUE;
+end property
+
+property PROPERTY_33v3_USER2 "Fairness: After user 2 creates memo 1, deletes memo 1, or comments on memo 1 all fair execution sequences will lead to a memo nofication and the memo update being reflected in activity." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <true*.({CREATEMEMO !2 !1 !1} or {DELETEMEMO !2 !1 !1} or {COMMENTONMEMO !2 !1 !1 !"1"}).true*.({MEMONOTIFY ...} and {MEMOACTIVITYUPDATE ...}))>true;
+    expected TRUE;
+end property
+
+property PROPERTY_34_ORIGINAL_NO_DATA "Fairness: After a user completes creating a calendar or joining a calendar all fair execution sequences will lead to the user being added to the calendar." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [true.(CREATECALENDAR or JOINCALENDAR).(not(ADDEDTOCALENDAR))]<true*.(ADDEDTOCALENDAR)>true;
+    expected TRUE;
+end property
+
+property PROPERTY_34v2_WITH_GENERAL_DATA "Fairness: After a user completes creating calendar 1 or joining a calendar 1 all fair execution sequences will lead to the user being added to the calendar." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [true.({CREATECALENDAR ...} or {JOINCALENDAR ...}).(not({ADDEDTOCALENDAR ...}))]<true*.({ADDEDTOCALENDAR ...})>true;
+    expected TRUE;
+end property
+
+property PROPERTY_34v3_USER1 "Fairness: After user 1 completes creating calendar 1 or joining calendar 1 all fair execution sequences will lead to the user being added to the calendar." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [true.({CREATECALENDAR !1 !1} or {JOINCALENDAR !1 !1}).(not({ADDEDTOCALENDAR !1 !1}))]<true*.({ADDEDTOCALENDAR !1 !1})>true;
+    expected TRUE;
+end property
+
+property PROPERTY_34v4_USER2 "Fairness: After user 2 completes creating calendar 1 or joining calendar 1 all fair execution sequences will lead to the user being added to the calendar." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [true.({CREATECALENDAR !2 !1} or {JOINCALENDAR !2 !1}).(not({ADDEDTOCALENDAR !2 !1}))]<true*.({ADDEDTOCALENDAR !2 !1})>true;
+    expected TRUE;
+end property
+
+property PROPERTY_37_ORIGINAL_WITH_GENERAL_DATA "Safety: A user cannot comment on an event before it has been created." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+    macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+    NOT_1_BEFORE_2({COMMENTONEVENT...},{CREATEEVENT...});
+    expected TRUE;
+end property
+
+property PROPERTY_37v2_USER1 "Safety: user 1 cannot comment on event 1 before it has been created." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+    macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+    NOT_1_BEFORE_2({COMMENTONEVENT !1 !1 !1 !"1"}, ({CREATEEVENT !1 !1 !EVENT (1, 0, 0, 0, 0)} or {CREATEEVENT !2 !1 !EVENT (1, 0, 0, 0, 0)}));
+    expected TRUE;
+end property
+
+property PROPERTY_37v3_USER2 "Safety: user 2 cannot comment on event 1 before it has been created." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+    macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+    NOT_1_BEFORE_2({COMMENTONEVENT !2 !1 !1 !"1"}, ({CREATEEVENT !1 !1 !EVENT (1, 0, 0, 0, 0)} or {CREATEEVENT !2 !1 !EVENT (1, 0, 0, 0, 0)}));
+    expected TRUE;
+end property
+
+property PROPERTY_38_ORIGINAL_WITH_GENERAL_DATA "Safety: A user cannot change the date or time of an event before it has been created." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+    macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+    NOT_1_BEFORE_2({CHANGEEVENTDATEANDTIME...},{CREATEEVENT...});
+    expected TRUE;
+end property
+
+property PROPERTY_38v2_USER1 "Safety: user 1 cannot change the date or time of event 1 before it has been created." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+    macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+    NOT_1_BEFORE_2({CHANGEEVENTDATEANDTIME !1 !1 !EVENT (1, 13, 24, 8, 18)}, ({CREATEEVENT !1 !1 !EVENT (1, 0, 0, 0, 0)} or {CREATEEVENT !2 !1 !EVENT (1, 0, 0, 0, 0)}));
+    expected TRUE;
+end property
+
+property PROPERTY_38v3_USER2 "Safety: user 2 cannot change the date or time of event 1 before it has been created." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+    macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+    NOT_1_BEFORE_2({CHANGEEVENTDATEANDTIME !2 !1 !EVENT (1, 13, 24, 8, 18)}, ({CREATEEVENT !1 !1 !EVENT (1, 0, 0, 0, 0)} or {CREATEEVENT !2 !1 !EVENT (1, 0, 0, 0, 0)}));
+    expected TRUE;
+end property
+
+property PROPERTY_9_ORIGINAL_WITH_GENERAL_DATA "Safety: A user must signout in order to have signed in." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+    macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+    NOT_1_BEFORE_2({SIGNIN...},{SIGNOUT...});
+    expected TRUE;
+end property
+
+property PROPERTY_9v2_USER1 "Safety: user 1 must signout in order to have signed in." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+    macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+    NOT_1_BEFORE_2({SIGNIN !1},{SIGNOUT !1});
+    expected TRUE;
+end property
+
+property PROPERTY_9v3_USER2 "Safety: user 2 must signout in order to have signed in." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+    macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+    NOT_1_BEFORE_2({SIGNIN !2},{SIGNOUT !2});
+    expected TRUE;
+end property
+
+property PROPERTY_14_ORIGINAL "Liveness: Timetree is deadlock free; there should always be some action occuring." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [true*]<true> true;
+    expected TRUE;
+end property
+
+property PROPERTY_18_ORIGINAL_WITH_USER1 "Liveness: User1 can potentially create a calendar after signing up or in." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <(true*.({SIGNUP !1} or {SIGNIN !1}).true*.{CREATECALENDAR !1 !1})> true;
+    expected TRUE;
+end property
+
+property PROPERTY_19_ORIGINAL_WITH_USER2 "Liveness: User2 can potentially create a calendar after signing up or in." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <(true*.({SIGNUP !2} or {SIGNIN !2}).true*.{CREATECALENDAR !2 !1})> true;
+    expected TRUE;
+end property
+
+property PROPERTY_35_ORGINAL_WITH_GENERAL_DATA "Safety: A user cannot comment on a memo before it has been created." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+NOT_1_BEFORE_2({COMMENTONMEMO...},{CREATEMEMO...});
+    expected TRUE;
+end property
+
+property PROPERTY_35v2_USER1 "Safety: user 1 cannot comment on memo 1 before it has been created." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+NOT_1_BEFORE_2({COMMENTONMEMO !1 !1 !1 !"1"}, ({CREATEMEMO !1 !1 !1} or {CREATEMEMO !2 !1 !1}));
+    expected TRUE;
+end property
+
+property PROPERTY_35v3_USER2 "Safety: user 2 cannot comment on memo 1 before it has been created." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+NOT_1_BEFORE_2({COMMENTONMEMO !2 !1 !1 !"1"}, ({CREATEMEMO !1 !1 !1} or {CREATEMEMO !2 !1 !1}));
+    expected TRUE;
+end property
+
+property PROPERTY_36_ORGINAL_WITH_GENERAL_DATA "Safety: A user cannot update a memo before it has been created." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+NOT_1_BEFORE_2({UPDATEMEMO...},{CREATEMEMO...});
+    expected TRUE;
+end property
+
+property PROPERTY_36v2_USER1 "Safety: user 1 cannot update memo 1 before it has been created." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+NOT_1_BEFORE_2({UPDATEMEMO !1 !1 !1}, ({CREATEMEMO !1 !1 !1} or {CREATEMEMO !2 !1 !1}));
+    expected TRUE;
+end property
+
+property PROPERTY_36v3_USER2 "Safety: user 2 cannot update a memo before it has been created." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+NOT_1_BEFORE_2({UPDATEMEMO !2 !1 !1}, ({CREATEMEMO !1 !1 !1} or {CREATEMEMO !2 !1 !1}));
+    expected TRUE;
+end property
+
+property PROPERTY_39 "Safety: A user must Receive an invitation link first to Join a calender " is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+    macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+    NOT_1_BEFORE_2({JOINCALENDAR...},{INVITELINKTOCALENDAR...});
+    expected TRUE;
+end property
+
+property PROPERTY_40 "Safety: memo notification cannot be executed with out a memo being created, delete, updated or commented on." is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    [(not({CREATEMEMO...} or {DELETEEMEMO...} or {UPDATEMEMO...} or {COMMENTONMEMO...}))*.({MEMONOTIFY...}))] false;
+    expected TRUE;
+end property
+
+property PROPERTY_41 "Liveness: DisplayActivity should be able to be executed after a user requests to view it" is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    <(true*.{VIEWEACTIVITY !1}.{DISPLAYACTIVITY !1})> true;
+    expected TRUE;
+end property
+
+property PROPERTY_42 "Safety: A user must send an invitation for another user to receive the link " is
+    "Trialx4.lnt"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+    macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+    NOT_1_BEFORE_2({INVITELINKTOCALENDAR...},{INVITEOCALENDAR...});
+    expected TRUE;
+end property
