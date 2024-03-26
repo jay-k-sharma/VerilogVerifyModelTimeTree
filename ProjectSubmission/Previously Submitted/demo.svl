@@ -1,0 +1,362 @@
+"Trial6_4.bcg" = generation of "Trial6_4.lnt";
+
+property PROPERTY_1 "Safety: same user1 cannot sign up immediately after they just have." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    [({SIGNUP !1}.{SIGNUP !1})] false;
+    expected TRUE;
+end property
+
+property PROPERTY_2 "Safety: same user2 cannot sign up immediately after they just have." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    [({SIGNUP !2}.{SIGNUP !2})] false;
+    expected TRUE;
+end property
+
+property PROPERTY_3 "Safety: same user1 cannot sign in immediately after they just have." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    [({SIGNIN !1}.{SIGNIN !1})] false;
+    expected TRUE;
+end property
+
+property PROPERTY_4 "Safety: same user2 cannot sign in immediately after they just have." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    [({SIGNIN !2}.{SIGNIN !2})] false;
+    expected TRUE;
+end property
+
+property PROPERTY_5 "Safety: same user1 cannot sign out immediately after they just have." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    [({SIGNOUT !1}.{SIGNOUT !1})] false;
+    expected TRUE;
+end property
+
+property PROPERTY_6 "Safety: same user2 cannot sign out immediately after they just have." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    [({SIGNOUT !2}.{SIGNOUT !2})] false;
+    expected TRUE;
+end property
+
+property PROPERTY_7 "Safety: A user cannot use any application functionality without being signed up or signed in." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    [false.(not({SIGNUP ...} or {SIGNIN ...}))*.true*] false;
+    expected TRUE;
+end property
+
+property PROPERTY_8 "Safety: A user must have signed up inorder to have signed out." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+    macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+    NOT_1_BEFORE_2({SIGNOUT...},{SIGNUP...});
+    expected TRUE;
+end property
+
+property PROPERTY_9 "Safety: A user must signout in order to have signed in." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+    macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+    NOT_1_BEFORE_2({SIGNIN...},{SIGNOUT...});
+    expected TRUE;
+end property
+
+property PROPERTY_10 "Safety: A user cannot create calendar without signing up or in." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    [(not({SIGNUP ...} or {SIGNIN ...}))*.{CREATECALENDAR ...}] false;
+    expected TRUE;
+end property
+
+property PROPERTY_11 "Safety: A user cannot delete calendar without signing up or in." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    [(not({SIGNUP ...} or {SIGNIN ...}))*.{DELETECALENDAR ...}] false;
+    expected TRUE;
+end property
+
+property PROPERTY_12 "Safety: A user cannot delete calendar without it being created." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    [(not({CREATECALENDAR ...}))*.{DELETECALENDAR ...}] false;
+    expected TRUE;
+end property
+
+property PROPERTY_13 "Safety: A user cannot create an event or a memo without calendar being created." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    [(not({CREATECALENDAR ...}))*.({CREATEEVENT ...} or {CREATEMEMO ...})] false;
+    expected TRUE;
+end property
+
+property PROPERTY_14 "Liveness: Timetree is deadlock free; there should always be some action occuring." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    [true*]<true> true;
+    expected TRUE;
+end property
+
+property PROPERTY_15 "Liveness: Should be able for some user to sign up followed by some user signing up immediately after." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    <({SIGNUP ...}.{SIGNUP ...})> true;
+    expected TRUE;
+end property
+
+property PROPERTY_16 "Liveness: Should be able for some user to sign in followed by some user signing in immediately after." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    <({SIGNIN ...}.{SIGNIN ...})> true;
+    expected TRUE;
+end property
+
+property PROPERTY_17 "Liveness: Should be able for some user to sign out followed by some user signing out immediately after." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    <({SIGNOUT ...}.{SIGNOUT ...})> true;
+    expected TRUE;
+end property
+
+property PROPERTY_18 "Liveness: User1 can potentially create a calendar after signing up or in." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    <(true*.({SIGNUP !1} or {SIGNIN !1}).true*.{CREATECALENDAR !1})> true;
+    expected TRUE;
+end property
+
+property PROPERTY_19 "Liveness: User2 can potentially create a calendar after signing up or in." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    <(true*.({SIGNUP !2} or {SIGNIN !2}).true*.{CREATECALENDAR !2})> true;
+    expected TRUE;
+end property
+
+property PROPERTY_20 "Liveness: Any user leads to sign up after a finite number of actions" is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    mu X . ((< ({SIGNUP ...}) > true or < not ({SIGNUP ...}) > X) and [ not ({SIGNUP ...}) ] X);
+    expected TRUE;
+end property
+
+
+
+property PROPERTY_21 "Liveness: Display calendar is inevitable if user selects to view calendar." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro INEVITABLE (A) =
+    mu X . ((< (A) > true or < not (A) > X) and [ not (A) ] X)
+    end_macro
+    macro AFTER_1_INEVITABLE_2 (A, B) =
+    [ true* . (A) ] INEVITABLE (B)
+    end_macro
+    AFTER_1_INEVITABLE_2(VIEWCALENDAR, DISPLAYCALENDAR);
+    expected TRUE;
+end property
+
+property PROPERTY_22 "Liveness: Display event is inevitable if user selects to view event." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro INEVITABLE (A) =
+    mu X . ((< (A) > true or < not (A) > X) and [ not (A) ] X)
+    end_macro
+    macro AFTER_1_INEVITABLE_2 (A, B) =
+    [ true* . (A) ] INEVITABLE (B)
+    end_macro
+    AFTER_1_INEVITABLE_2(VIEWEVENT, DISPLAYEVENT);
+    expected TRUE;
+end property
+
+property PROPERTY_23 "Liveness: Display memo is inevitable if user selects to view memo." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro INEVITABLE (A) =
+    mu X . ((< (A) > true or < not (A) > X) and [ not (A) ] X)
+    end_macro
+    macro AFTER_1_INEVITABLE_2 (A, B) =
+    [ true* . (A) ] INEVITABLE (B)
+    end_macro
+    AFTER_1_INEVITABLE_2(VIEWMEMO, DISPLAYMEMO);
+    expected TRUE;
+end property
+
+property PROPERTY_24 "Liveness: Search result is inevitably returned to user when they submit search." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro INEVITABLE (A) =
+    mu X . ((< (A) > true or < not (A) > X) and [ not (A) ] X)
+    end_macro
+    macro AFTER_1_INEVITABLE_2 (A, B) =
+    [ true* . (A) ] INEVITABLE (B)
+    end_macro
+    AFTER_1_INEVITABLE_2(SEARCH, RESULT);
+    expected TRUE;
+end property
+
+property PROPERTY_25 "Fairness: After user completes signing up it is fairly possible to sign out*." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro SOME (R) = < (R) > true end_macro
+    macro FAIRLY (A) =   [ (not (A))* ] SOME (true* . (A)) end_macro
+    macro AFTER_1_FAIRLY_2 (A, B) =  [ true* . (A) ] FAIRLY (B) end_macro
+    AFTER_1_FAIRLY_2 ({SIGNUP ...}, {SIGNOUT ...});
+    expected TRUE;
+end property
+
+property PROPERTY_26 "Fairness: After user1 completes signing up it is fairly possible to sign out*." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro SOME (R) = < (R) > true end_macro
+    macro FAIRLY (A) =   [ (not (A))* ] SOME (true* . (A)) end_macro
+    macro AFTER_1_FAIRLY_2 (A, B) =  [ true* . (A) ] FAIRLY (B) end_macro
+    AFTER_1_FAIRLY_2 ({SIGNUP !1}, {SIGNOUT !1});
+    expected TRUE;
+end property
+
+property PROPERTY_27 "Fairness: After user2 completes signing up it is fairly possible to sign out*." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro SOME (R) = < (R) > true end_macro
+    macro FAIRLY (A) =   [ (not (A))* ] SOME (true* . (A)) end_macro
+    macro AFTER_1_FAIRLY_2 (A, B) =  [ true* . (A) ] FAIRLY (B) end_macro
+    AFTER_1_FAIRLY_2 ({SIGNUP !2}, {SIGNOUT !2});
+    expected TRUE;
+end property
+
+property PROPERTY_28 "Fairness: After user completes signing in it is fairly possible to sign out*." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro SOME (R) = < (R) > true end_macro
+    macro FAIRLY (A) =   [ (not (A))* ] SOME (true* . (A)) end_macro
+    macro AFTER_1_FAIRLY_2 (A, B) =  [ true* . (A) ] FAIRLY (B) end_macro
+    AFTER_1_FAIRLY_2 ({SIGNIN ...}, {SIGNOUT ...});
+    expected TRUE;
+end property
+
+property PROPERTY_29 "Fairness: After user1 completes signing in it is fairly possible to sign out*." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro SOME (R) = < (R) > true end_macro
+    macro FAIRLY (A) =   [ (not (A))* ] SOME (true* . (A)) end_macro
+    macro AFTER_1_FAIRLY_2 (A, B) =  [ true* . (A) ] FAIRLY (B) end_macro
+    AFTER_1_FAIRLY_2 ({SIGNIN !1}, {SIGNOUT !1});
+    expected TRUE;
+end property
+
+property PROPERTY_30 "Fairness: After user2 completes signing in it is fairly possible to sign out*." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro SOME (R) = < (R) > true end_macro
+    macro FAIRLY (A) =   [ (not (A))* ] SOME (true* . (A)) end_macro
+    macro AFTER_1_FAIRLY_2 (A, B) =  [ true* . (A) ] FAIRLY (B) end_macro
+    AFTER_1_FAIRLY_2 ({SIGNIN !2}, {SIGNOUT !2});
+    expected TRUE;
+end property
+
+property PROPERTY_31 "Fairness: After sending a chat, all fair execution sequences will lead to a calendar notification." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    [true*.CHAT.(not(CALENDARNOTIFY))*]<true*.(CALENDARNOTIFY)>true;
+    expected TRUE;
+end property
+
+property PROPERTY_32 "Fairness: After creating an event, deleting an event, changing the date and time of an event or commenting on an event all fair execution sequences will lead to an event nofication and the event update being reflected in activity." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    [true*.(CREATEEVENT or DELETEEVENT or CHANGEEVENTDATEANDTIME or COMMENTONEVENT).(not(EVENTNOTIFY and EVENTACTIVITYUPDATE))*]<true*.(EVENTNOTIFY and EVENTACTIVITYUPDATE)>true;
+    expected TRUE;
+end property
+
+property PROPERTY_33 "Fairness: After creating a memo, deleting an memo, or commenting on a memo all fair execution sequences will lead to a memo nofication and the memo update being reflected in activity." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    [true*.(CREATEMEMO or DELETEMEMO or COMMENTONMEMO).(not(MEMONOTIFY and MEMOACTIVITYUPDATE))*]<true*.(MEMONOTIFY and MEMOACTIVITYUPDATE)>true;
+    expected TRUE;
+end property
+
+property PROPERTY_34 "Fairness: After a user completes creating a calendar or joining a calendar all fair execution sequences will lead to the user being added to the calendar." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    [true.(CREATECALENDAR or JOINCALENDAR).(not(ADDEDTOCALENDAR))]<true*.(ADDEDTOCALENDAR)>true;
+    expected TRUE;
+end property
+
+property PROPERTY_35 "Safety: A user cannot comment on a memo before it has been created." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+NOT_1_BEFORE_2({COMMENTONMEMO...},{CREATEMEMO...});
+    expected TRUE;
+end property
+
+property PROPERTY_36 "Safety: A user cannot update a memo before it has been created." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+NOT_1_BEFORE_2({UPDATEMEMO...},{CREATEMEMO...});
+    expected TRUE;
+end property
+
+property PROPERTY_37 "Safety: A user cannot comment on an event before it has been created." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+NOT_1_BEFORE_2({COMMENTONEVENT...},{CREATEEVENT...});
+    expected TRUE;
+end property
+
+property PROPERTY_38 "Safety: A user cannot change the date or time of an event before it has been created." is
+    "Trial6_4.bcg"
+    |= with evaluator4
+    library standard.mcl end_library
+    macro NEVER (R) =  [ (R) ] false end_macro
+macro NOT_1_BEFORE_2 (A, B) =  NEVER ((not (B))* . (A)) end_macro
+NOT_1_BEFORE_2({CHANGEEVENTDATEANDTIME...},{CREATEEVENT...});
+    expected TRUE;
+end property
+
