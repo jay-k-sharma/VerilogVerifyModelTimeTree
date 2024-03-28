@@ -1,0 +1,154 @@
+(******************************************************************************
+ *                              E V A L U A T O R
+ *-----------------------------------------------------------------------------
+ *   INRIA - Unite de Recherche Rhone-Alpes
+ *   655, avenue de l'Europe
+ *   38330 Montbonnot Saint Martin
+ *   FRANCE
+ *-----------------------------------------------------------------------------
+ *   Module             :       standard.mcl
+ *   Auteur             :       Radu MATEESCU
+ *   Version            :       1.18
+ *   Date               :       2016/09/26 16:38:01
+ *****************************************************************************)
+
+(* ========================================================================= *)
+(* Macros having one argument                                                *)
+(* ========================================================================= *)
+
+(* There exists at least one action sequence R *)
+
+macro SOME (R) =
+    < (R) > true
+end_macro
+
+(* ------------------------------------------------------------------------- *)
+
+(* There is no action sequence R *)
+
+macro NEVER (R) =
+    [ (R) ] false
+end_macro
+
+(* ------------------------------------------------------------------------- *)
+
+(* The action A is inevitably reachable *)
+
+macro INEVITABLE (A) =
+    mu X . ((< (A) > true or < not (A) > X) and [ not (A) ] X)
+end_macro
+
+(* ------------------------------------------------------------------------- *)
+
+(* The action A is fairly reachable *)
+
+macro FAIRLY (A) =
+    [ (not (A))* ] SOME (true* . (A))
+end_macro
+
+(* ========================================================================= *)
+(* Macros having two arguments                                               *)
+(* ========================================================================= *)
+
+(* Initially, action A never occurs before action B *)
+
+macro NOT_1_BEFORE_2 (A, B) =
+    NEVER ((not (B))* . (A))
+end_macro
+
+(* ------------------------------------------------------------------------- *)
+
+(* Actions A and B alternate, starting with an A *)
+
+macro ALTERNATE_1_THEN_2 (A, B) =
+    NEVER (
+        ((nil | (true* . (B))) . (not (A))* . (B))
+        |
+        (true* . (A) . (not (B))* . (A))
+    )
+end_macro
+
+(* ------------------------------------------------------------------------- *)
+
+(* After action A, the action B is inevitably reachable *)
+
+macro AFTER_1_INEVITABLE_2 (A, B) =
+    [ true* . (A) ] INEVITABLE (B)
+end_macro
+
+(* ------------------------------------------------------------------------- *)
+
+(* After action A, the action B is fairly reachable *)
+
+macro AFTER_1_FAIRLY_2 (A, B) =
+    [ true* . (A) ] FAIRLY (B)
+end_macro
+
+(* ------------------------------------------------------------------------- *)
+
+(* All the execution sequences starting from the current state inevitably
+ * lead to action A such that the state immediately after A satisfies P
+ *)
+
+macro INEVITABLE_1_WHERE_2 (A, P) =
+    mu X . ((< (A) > true or < not (A) > X) and [ (A) ] (P) and [ not (A) ] X)
+end_macro
+
+(* Notice that INEVITABLE (A) = INEVITABLE_1_WHERE_2 (A, true) *)
+
+(* ------------------------------------------------------------------------- *)
+
+(* All the execution sequences starting from the current state inevitably
+ * lead to action A, after which all the subsequent execution sequences 
+ * inevitably lead to action B
+ *)
+
+macro INEVITABLE_1_THEN_2 (A, B) =
+    INEVITABLE_1_WHERE_2 (A, INEVITABLE (B))
+end_macro
+
+(* ------------------------------------------------------------------------- *)
+
+(* All the execution sequences starting from the current state inevitably
+ * contain (at least) N times the action A; this macro can only be used
+ * with EVALUATOR 4
+ *)
+
+macro INEVITABLE_1_TIMES_2 (A, N) =
+    mu X (C:Nat := N) . ((C > 0) implies (
+        (< (A) > true or < not (A) > X (C)) and
+        [ (A) ] X (C - 1) and [ not (A) ] X (C)
+    ))
+end_macro
+
+(* Notice that INEVITABLE (A) = INEVITABLE_1_TIMES_2 (A, 1) *)
+
+(* ------------------------------------------------------------------------- *)
+
+(* All the execution sequences starting from the current state consist of a
+ * finite number (possibly zero) of actions A, immediately followed by one
+ * action B
+ *)
+
+macro ALWAYS_1_UNTIL_2 (A, B) =
+    mu X . ((< (B) > true or < not (B) > X) and
+        [ not ((A) or (B)) ] false and [ not (B) ] X)
+end_macro
+
+(* Notice that INEVITABLE (A) = ALWAYS_1_UNTIL_2 (true, A) *)
+
+(* ========================================================================= *)
+(* Macros having three arguments                                             *)
+(* ========================================================================= *)
+
+(* After an action A, it is impossible to reach an action B before
+ * executing an action C *)
+
+macro NOT_1_TO_2_UNLESS_3 (A, B, C) =
+    NEVER (true* . (A) . (not (C))* . (B))
+end_macro
+
+(* ========================================================================= *)
+
+
+
