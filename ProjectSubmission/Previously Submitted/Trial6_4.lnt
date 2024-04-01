@@ -1,0 +1,643 @@
+module Trial6_4 with ==, !=, >= is
+------------------------------------------------------------------------
+--  Types
+------------------------------------------------------------------------
+type Event is Event (ID: Nat, Date: Nat, Year: Nat, TimeHour: Nat, TimeMin: Nat) end type
+type Memo is Memo (ID: Nat, MemoContent: Nat) end type
+type Activity is Activity (ID: Nat, CalendarID: Nat, EventUpdate: bool, MemoUpdate: bool, ObjectID: Nat) end type
+
+type ListOfCalendarID is list of Nat with empty, head, tail, member end type
+type ListOfUserID is list of Nat with empty, head, tail, member end type
+type ListOfEvent is list of Event with empty, head, tail, member end type
+-- type ListOfEvent is list of Event end type
+type ListOfMemo is list of Memo with empty, head, tail, member end type
+-- type ListOfMemo is list of Memo end type
+type ListOfActivity is list of Activity with empty, head, tail, member end type
+-- type ListOfActivity is list of Activity end type
+
+------------------------------------------------------------------------
+--  Channels
+------------------------------------------------------------------------
+channel N is (NatNum: Nat) end channel
+channel N2 is (NatNum1: Nat, NatNum2: Nat) end channel
+------------------------------------------------------------------------
+--  Processes
+------------------------------------------------------------------------
+
+	process CalendarManager [CalendarActivtyUpdate, EventActivityUpdate, MemoActivityUpdate: none,
+		                 CreateCalendar: N, DeleteCalendar: N2,
+		                 InviteToCalendar, JoinCalendar, LeaveCalendar,
+		                 Chat, 
+		                 ViewCalendar, DisplayCalendar, 
+		                 CalendarNotify: none,
+                                 AddedToCalendar: none,
+                                 Search, Result: none,
+		                 CreateEvent, DeleteEvent,
+		                 ChangeEventDateAndTime,
+		                 CommentOnEvent, 
+		                 ViewEvent, DisplayEvent,
+		                 EventNotify, 
+		                 CreateMemo, DeleteMemo,
+		                 CommentOnMemo, UpdateMemo,
+		                 ViewMemo, DisplayMemo,
+		                 MemoNotify: none] is
+	    par CreateCalendar, DeleteCalendar in
+                Calendar [CalendarActivtyUpdate, EventActivityUpdate, MemoActivityUpdate,
+		          CreateCalendar, DeleteCalendar, 
+		          InviteToCalendar, JoinCalendar, LeaveCalendar,
+		          Chat, 
+		          ViewCalendar, DisplayCalendar, 
+		          CalendarNotify,
+                          AddedToCalendar,
+                          Search, Result,
+		          CreateEvent, DeleteEvent,
+		          ChangeEventDateAndTime,
+		          CommentOnEvent, 
+		          ViewEvent, DisplayEvent,
+		          EventNotify, 
+		          CreateMemo, DeleteMemo,
+		          CommentOnMemo,UpdateMemo, 
+		          ViewMemo, DisplayMemo,
+		          MemoNotify] (1, 0, {}, {}, {}, {}) 
+            ||
+                Calendar [CalendarActivtyUpdate, EventActivityUpdate, MemoActivityUpdate,
+		          CreateCalendar, DeleteCalendar, 
+		          InviteToCalendar, JoinCalendar, LeaveCalendar,
+		          Chat, 
+		          ViewCalendar, DisplayCalendar, 
+		          CalendarNotify,
+		          AddedToCalendar,
+		          Search, Result,
+		          CreateEvent, DeleteEvent,
+		          ChangeEventDateAndTime,
+		          CommentOnEvent, 
+		          ViewEvent, DisplayEvent,
+		          EventNotify, 
+		          CreateMemo, DeleteMemo,
+		          CommentOnMemo, UpdateMemo,
+		          ViewMemo, DisplayMemo,
+		          MemoNotify] (2, 0, {}, {}, {}, {})
+	  end par
+	end process
+	
+	process UserManager [SignUp, SignIn, SignOut: N,
+		             CreateCalendar: N, DeleteCalendar: N2, 
+		             InviteToCalendar, JoinCalendar, LeaveCalendar,
+		             Chat, 
+			     ViewCalendar, DisplayCalendar, 
+		 	     CalendarNotify: none,
+		 	     AddedToCalendar: none,
+		 	     Search, Result: none,
+			     CreateEvent, DeleteEvent,
+			     ChangeEventDateAndTime,
+			     CommentOnEvent, 
+			     ViewEvent, DisplayEvent,
+			     EventNotify, 
+			     CreateMemo, DeleteMemo,
+			     CommentOnMemo, UpdateMemo,
+			     ViewMemo, DisplayMemo,
+			     MemoNotify: none] is
+			     
+	    par
+                User [SignUp, SignIn, SignOut,
+		      CreateCalendar, DeleteCalendar, 
+		      InviteToCalendar, JoinCalendar, LeaveCalendar,
+		      Chat, 
+		      ViewCalendar, DisplayCalendar, 
+		      CalendarNotify,
+		      AddedToCalendar,
+		      Search, Result,
+		      CreateEvent, DeleteEvent,
+		      ChangeEventDateAndTime,
+		      CommentOnEvent, 
+		      ViewEvent, DisplayEvent,
+		      EventNotify, 
+		      CreateMemo, DeleteMemo,
+		      CommentOnMemo, UpdateMemo,
+		      ViewMemo, DisplayMemo,
+		      MemoNotify] (1, {}) -- user 1 with no calendars currently
+              ||
+                 User [SignUp, SignIn, SignOut,
+		       CreateCalendar, DeleteCalendar, 
+		       InviteToCalendar, JoinCalendar, LeaveCalendar,
+		       Chat, 
+		       ViewCalendar, DisplayCalendar, 
+		       CalendarNotify,
+		       AddedToCalendar,
+		       Search, Result,
+		       CreateEvent, DeleteEvent,
+		       ChangeEventDateAndTime,
+		       CommentOnEvent, 
+		       ViewEvent, DisplayEvent,
+		       EventNotify, 
+		       CreateMemo, DeleteMemo,
+		       CommentOnMemo, UpdateMemo,
+		       ViewMemo, DisplayMemo,
+		       MemoNotify] (2, {}) -- user 2 with no calendars currently
+              end par
+        end process  
+
+	process Calendar[CalendarActivtyUpdate, EventActivityUpdate, MemoActivityUpdate: none,
+		         CreateCalendarReceive: N, DeleteCalendarReceive: N2, 
+		         InviteToCalendarReceive, JoinCalendarReceive, LeaveCalendarReceive,
+		         ChatReceive, 
+		         ViewCalendarReceive, DisplayCalendar,
+		         CalendarNotify: none,
+                         AddedToCalendar: none,
+                         SearchReceive, Result: none,
+		         CreateEventReceive, DeleteEventReceive,
+		         ChangeEventDateAndTimeReceive,
+		         CommentOnEventReceive, 
+		         ViewEventReceive, DisplayEvent,
+		         EventNotify,
+		         CreateMemoReceive, DeleteMemoReceive,
+		         CommentOnMemoReceive, UpdateMemoReceive,
+		         ViewMemoReceive, DisplayMemo,
+		         MemoNotify: none] (CalendarID: Nat, in var
+		                            MakerID: Nat, in var
+		                            ListOfUID: ListOfUserID, in var
+		                            ListOfE: ListOfEvent, in var
+		                            ListOfM: ListOfMemo, in var
+		                            ListOfA: ListOfActivity) is
+          var ActiveCal: Nat in
+            ActiveCal := 0;
+            loop
+		    select
+		    -- From Calendar to none
+		      if (ActiveCal != 0) then
+		        CalendarActivtyUpdate
+		      end if
+		    []
+		      if (ActiveCal != 0) then
+		        EventActivityUpdate
+		      end if
+		    []
+		      if (ActiveCal != 0) then
+		        MemoActivityUpdate
+		      end if
+		    []
+		    -- --------------------------------------------------------
+		    -- From User to Calendar (Basic)
+		      if (ActiveCal == 0) then
+		        var UserID: Nat in
+                          CreateCalendarReceive(?UserID);
+                          if((MakerID == 0) and (MakerID != UserID)) then
+                            ActiveCal := CalendarID;
+                            MakerID := UserID;
+                            ListOfUID := cons(MakerID, ListOfUID)
+                          end if
+		        end var		        
+		      end if
+		    []
+		      if (ActiveCal != 0) then
+		        if(ActiveCal == CalendarID) then
+		          var CalID: Nat, UserID: Nat in
+		            DeleteCalendarReceive(?CalID, ?UserID);
+		            if ((ActiveCal == CalID) and (MakerID == UserID)) then 
+			      ActiveCal := 0;
+			      ListOfE := {};
+			      ListOfM := {};
+			      ListOfA := {}
+		            end if
+		          end var
+		        end if
+		      end if
+		    []
+		      if (ActiveCal != 0) then
+		        InviteToCalendarReceive
+		      end if
+		    []
+		      if (ActiveCal != 0) then
+		        JoinCalendarReceive
+		      end if
+		    []
+		      if (ActiveCal != 0) then
+		        LeaveCalendarReceive
+		      end if
+		    []
+		      if (ActiveCal != 0) then
+		        ChatReceive
+		      end if
+		    []
+		      if (ActiveCal != 0) then
+		        ViewCalendarReceive
+		      end if
+		    []
+	            -- --------------------------------------------------------
+		    -- From Calendar to User (Basic)
+		      if (ActiveCal != 0) then
+		        DisplayCalendar
+		      end if
+		    []
+		      if (ActiveCal != 0) then
+		        CalendarNotify
+		      end if
+		    []
+		      if (ActiveCal != 0) then
+		        AddedToCalendar
+		      end if
+		    []
+		      if (ActiveCal != 0) then
+		        SearchReceive
+		      end if
+		    []
+		      if (ActiveCal != 0) then
+		        Result
+		      end if
+		    []
+		    -- --------------------------------------------------------
+		    -- --------------------------------------------------------
+		    -- --------------------------------------------------------
+		    -- From User to Calendar (Event)
+		      if (ActiveCal != 0) then
+		        CreateEventReceive
+		      end if
+		    []
+		      if (ActiveCal != 0) then
+		        DeleteEventReceive
+		      end if
+		    []
+		      if (ActiveCal != 0) then
+		        ChangeEventDateAndTimeReceive
+		      end if
+		    []
+		      if (ActiveCal != 0) then
+		        CommentOnEventReceive
+		      end if
+		    []
+		      if (ActiveCal != 0) then
+		        ViewEventReceive
+		      end if
+		    []
+		    -- --------------------------------------------------------
+		    -- From Calendar to User (Event)
+		      if (ActiveCal != 0) then
+		        DisplayEvent
+		      end if
+		    []
+		      if (ActiveCal != 0)  then
+		        EventNotify
+		      end if
+		    []
+		    -- --------------------------------------------------------
+		    -- --------------------------------------------------------
+		    -- --------------------------------------------------------
+		    -- From User to Calendar (Memo)
+		      if (ActiveCal != 0) then
+		        CreateMemoReceive
+		      end if
+		    []
+		      if (ActiveCal != 0) then
+		        DeleteMemoReceive
+		      end if
+		    []
+		      if (ActiveCal != 0) then
+		        CommentOnMemoReceive
+		      end if
+		    []
+		      if (ActiveCal != 0) then
+		        UpdateMemoReceive
+		      end if
+		    []
+		      if (ActiveCal != 0) then
+		        ViewMemoReceive
+		      end if
+		    []
+		    -- --------------------------------------------------------
+		    -- From Calendar to User (Memo)
+		      if (ActiveCal != 0) then
+		        DisplayMemo
+		      end if
+		    []
+		      if (ActiveCal != 0) then
+		        MemoNotify
+		      end if
+		    end select
+	    end loop
+          end var
+	end process
+
+	process User[SignUp, SignIn, SignOut: N,
+		     CreateCalendar: N, DeleteCalendar: N2, 
+		     InviteToCalendar, JoinCalendar, LeaveCalendar,
+		     Chat, 
+		     ViewCalendar, DisplayCalendarReceive, 
+		     CalendarNotifyReceive: none,
+		     AddedToCalendarReceive: none,
+		     Search, ResultReceive: none,
+		     CreateEvent, DeleteEvent,
+		     ChangeEventDateAndTime,
+		     CommentOnEvent, 
+		     ViewEvent, DisplayEventReceive,
+		     EventNotifyReceive, 
+		     CreateMemo, DeleteMemo,
+		     CommentOnMemo, UpdateMemo,
+		     ViewMemo, DisplayMemoReceive,
+		     MemoNotifyReceive: none] (UserID: Nat, in var ListOfCalID: ListOfCalendarID) is
+	  var signedUp: bool, signedIn: bool, signedOut: bool, ActiveUser: Nat in
+	  
+	  -- user created in user manager essentially means the user is signed up & ultimately signed
+	  -- in the TimeTree Application; create implies signed up which further implies signed in.
+	  signedUp := false;
+	  signedIn := false;
+	  signedOut := false;
+	  ActiveUser := 0;
+	  loop
+	    select
+	    -- From User to none
+	      if (ActiveUser == 0)  then
+	        if ((signedUp == false) and (signedIn == false) and (signedOut == false)) then
+                  SignUp(UserID);
+                  signedUp := true;
+	          signedIn := true;
+	          signedOut := false;
+	          ActiveUser := UserID
+	        end if
+	      end if
+	    []
+	      if (ActiveUser == 0) then
+	        if ((signedUp == true) and (signedIn == false) and (signedOut == false)) then
+                  SignIn(UserID);
+                  signedUp := true;
+	          signedIn := true;
+	          signedOut := false;
+	          ActiveUser := UserID
+	        end if
+	      end if
+	    []
+	      if (ActiveUser != 0) then
+	        if ((signedUp == true) and (signedIn == true) and (signedOut == false)) then
+                  SignOut(UserID);
+                  signedUp := true;
+                  signedIn := false;
+	          signedOut := true;
+	          ActiveUser := 0;
+                  select
+                    SignIn(UserID);
+                    signedUp := true;
+                    signedIn := true;
+                    signedOut := false;
+                   ActiveUser := UserID
+                  []
+                    null
+                  end select          
+	        end if
+	      end if
+	    []
+	    -- ---------------------------------------------------------------------------------------
+	    -- From User to Calendar (Basic)
+	      if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          CreateCalendar(ActiveUser)
+	        end if
+	      end if
+	    []
+	      if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          var CalID: Nat, UID: Nat in
+	            CalID := any Nat where ((CalID == 1) or (CalID == 2));
+	            UID := ActiveUser;
+	            if (member(CalID, ListOfCalID)) then
+		      DeleteCalendar(CalID, UID)	          
+		    end if
+	          end var
+	        end if
+	      end if         
+	    []
+	      if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          InviteToCalendar
+	        end if
+	      end if
+	    []
+	      if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          JoinCalendar
+	        end if
+	      end if
+	    []
+	      if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          LeaveCalendar
+	        end if
+	      end if
+	    []
+	      if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          Chat
+	        end if
+	      end if
+	    []
+	      if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          ViewCalendar
+	        end if
+	      end if
+	    []
+	    -- -------------------------------------------------------------------
+	    -- From Calendar to User (Basic)
+	      if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          DisplayCalendarReceive
+	        end if
+	      end if
+	    []
+	      if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          CalendarNotifyReceive
+	        end if
+	      end if
+	    []
+	      if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          AddedToCalendarReceive
+	        end if
+	      end if
+	    []
+              if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          Search
+	        end if
+	      end if
+	    []
+	     if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+		  ResultReceive
+	        end if
+	      end if
+	    []
+	    -- -------------------------------------------------------------------
+	    -- -------------------------------------------------------------------
+	    -- -------------------------------------------------------------------
+	    -- From User to Calendar (Event)
+	      if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          CreateEvent
+	        end if
+	      end if
+	    []
+	      if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          DeleteEvent
+	        end if
+	      end if
+	    []
+	      if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          ChangeEventDateAndTime
+	        end if
+	      end if
+	    []
+	      if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          CommentOnEvent
+	        end if
+	      end if
+	    []
+	      if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          ViewEvent
+	        end if
+	      end if
+	    []
+	    -- -------------------------------------------------------------------
+	    -- From Calendar to User (Event)
+	      if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          DisplayEventReceive
+	        end if
+	      end if
+	    []
+	      if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          EventNotifyReceive
+	        end if
+	      end if
+	    []
+	    -- -------------------------------------------------------------------
+	    -- -------------------------------------------------------------------
+	    -- -------------------------------------------------------------------
+	    -- From User to Calendar (Memo)
+	      if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          CreateMemo
+	        end if
+	      end if
+	    []
+	      if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          DeleteMemo
+	        end if
+	      end if
+	    []
+	      if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          CommentOnMemo
+	        end if
+	      end if
+	    []
+	      if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          UpdateMemo
+	        end if
+	      end if
+	    []
+	      if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          ViewMemo
+	        end if
+	      end if
+	    []
+	    -- -------------------------------------------------------------------
+	    -- From Calendar to User (Memo)
+	      if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          DisplayMemoReceive
+	        end if
+	      end if
+	    []
+	      if (signedIn == true) then
+	        if (ActiveUser == UserID) then
+	          MemoNotifyReceive
+	        end if
+	      end if
+	    end select
+	  end loop
+	  end var
+	end process
+
+	process Main[SignUp, SignIn, SignOut: N,
+	             CalendarActivtyUpdate, EventActivityUpdate, MemoActivityUpdate: none,
+				 CreateCalendar: N, DeleteCalendar: N2,
+				 InviteToCalendar, JoinCalendar, LeaveCalendar,
+				 Chat, 
+				 ViewCalendar, DisplayCalendar, 
+				 CalendarNotify: none,
+				 AddedToCalendar: none,
+				 Search, Result: none,
+				 CreateEvent, DeleteEvent,
+				 ChangeEventDateAndTime,
+				 CommentOnEvent, 
+				 ViewEvent, DisplayEvent,
+				 EventNotify, 
+				 CreateMemo, DeleteMemo,
+				 CommentOnMemo, UpdateMemo,
+				 ViewMemo, DisplayMemo,
+				 MemoNotify: none] is
+	  par 
+		CreateCalendar, DeleteCalendar, 
+		InviteToCalendar, JoinCalendar, LeaveCalendar,
+		Chat, 
+		ViewCalendar, DisplayCalendar, 
+		CalendarNotify,
+		AddedToCalendar,
+		Search, Result,
+		CreateEvent, DeleteEvent,
+		ChangeEventDateAndTime,
+		CommentOnEvent, 
+		ViewEvent, DisplayEvent,
+		EventNotify, 
+		CreateMemo, DeleteMemo,
+		CommentOnMemo, UpdateMemo,
+		ViewMemo, DisplayMemo,
+		MemoNotify in
+			
+	     UserManager [SignUp, SignIn, SignOut,
+		          CreateCalendar, DeleteCalendar, 
+		          InviteToCalendar, JoinCalendar, LeaveCalendar,
+		          Chat, 
+			  ViewCalendar, DisplayCalendar, 
+		 	  CalendarNotify,
+                          AddedToCalendar,
+                          Search, Result,
+			  CreateEvent, DeleteEvent,
+			  ChangeEventDateAndTime,
+			  CommentOnEvent, 
+			  ViewEvent, DisplayEvent,
+			  EventNotify, 
+			  CreateMemo, DeleteMemo,
+			  CommentOnMemo, UpdateMemo,
+			  ViewMemo, DisplayMemo,
+			  MemoNotify]
+	  ||
+	    CalendarManager [CalendarActivtyUpdate, EventActivityUpdate, MemoActivityUpdate,
+		             CreateCalendar, DeleteCalendar, 
+		             InviteToCalendar, JoinCalendar, LeaveCalendar,
+		             Chat, 
+		             ViewCalendar, DisplayCalendar, 
+		             CalendarNotify,
+		             AddedToCalendar,
+		             Search, Result,
+			     CreateEvent, DeleteEvent,
+			     ChangeEventDateAndTime,
+			     CommentOnEvent, 
+			     ViewEvent, DisplayEvent,
+			     EventNotify, 
+			     CreateMemo, DeleteMemo,
+			     CommentOnMemo, UpdateMemo,
+			     ViewMemo, DisplayMemo,
+			     MemoNotify]
+	  end par
+	end process
+end module
+
