@@ -1,0 +1,156 @@
+module uae with ==, !=, >= is
+
+ type page is activity, group, memo, event, calendar end type
+ type update is memoupdate, eventupdate, calendarupdate end type
+ type updates is list of update with empty, head, tail, member end type
+ type notification is n_eventupdate, n_eventstarting, n_memoupdate, n_calendarupdate end type
+ --type comment is comment(ID: nat) end type
+ type commentpage is event, memo end type
+ --type time is nat where time <= 24 end type
+
+channel P is (p: page) end channel
+channel U is (u: update) end channel
+channel N is (n: notification) end channel
+channel E is (ID: nat, t: nat, date: nat ) end channel
+channel C is (c: nat, p: commentpage ) end channel
+channel I is (ID: nat) end channel
+channel J is (CID: nat, UID: nat) end channel
+
+process Activity [View: P, Display: P, UpdateActivity: U](in var Lactivities: updates)is
+
+loop
+
+	var i: nat, p: page, a: update in
+	 select
+	  	View(?p);
+		if(p == activity) then
+			Display(p)
+		end if;
+		stop
+		
+	[]
+		UpdateActivity(?a);
+		Lactivities := cons(a,Lactivities)
+		
+		
+	end select
+
+	end var
+
+
+end loop
+
+end process
+
+process Event[View: P, Display: P, UpdateActivity: U, UpdateEvent: E, DeleteEvent: I, Comment: C, Create: E] (ID: Nat)is
+var e: Page, tm:nat, date: nat in
+e:= event;
+--id := ID;
+loop 
+var p: page in
+	View(?p);
+		if(p == event) then
+			Display(e);
+
+			var i: Nat, t: nat, d: nat, c: commentpage in 
+			select
+				Create(?i , ?t , ?d );
+				ID := i;
+				tm := t;
+				date := d;
+				UpdateActivity(eventupdate)
+			[]
+				UpdateEvent(?i, ?t, ?d);
+				if(ID == i) then
+					tm := t;
+					date := d;
+					UpdateActivity(eventupdate)
+				end if
+			[]
+				DeleteEvent(?i); -- don't know what to do here
+				if(ID == i) then
+					UpdateActivity(eventupdate);
+					stop
+				end if
+				
+			[]
+				Comment(?i, ?c);
+				if(ID == i) then
+					UpdateActivity(eventupdate)
+				end if
+
+			
+			end select
+			end var
+		end if
+				
+
+end var		
+end loop
+end var
+end process
+
+
+process User[View: P, Display: P, UpdateEvent: E, DeleteEvent: I, Create: E, Comment: C](ID: Nat) is
+var e: page, ec: commentpage, a: page in
+ec := event; 
+e:= event;
+a:= activity;
+loop 
+	var p: page in
+		select
+		
+			View(e);
+			Display(?p);
+			select
+				Create(1, 10, 2024)
+			[]
+				UpdateEvent(1, 11, 2024)
+			[]
+				DeleteEvent(1);
+				stop
+			[]
+				Comment(1, ec)
+			end select
+			
+		[]
+			View(a);
+			Display(?p);
+			stop
+		end select
+
+	end var	
+			
+
+		
+end loop
+end var
+end process
+
+process Main[View: P, Display: P, UpdateActivity: U, UpdateEvent: E, DeleteEvent: I, Comment: C, Create: E] is 
+var c1: Nat in 
+ c1 :=1;
+
+par View, Display in
+	Activity[View, Display, UpdateActivity ]({})
+||
+	User[View, Display, UpdateEvent, DeleteEvent, Create,  Comment](c1)
+end par;
+
+	par View, Display, UpdateEvent, DeleteEvent,Comment, Create in
+		User[View, Display, UpdateEvent, DeleteEvent, Create,  Comment](c1)
+	||
+		Event[View, Display, UpdateActivity, UpdateEvent, DeleteEvent,Comment, Create](c1)
+	end par;
+
+par UpdateActivity in
+		Activity[View, Display, UpdateActivity ]({})
+	||
+		Event[View, Display, UpdateActivity, UpdateEvent, DeleteEvent,Comment, Create](c1)
+	end par
+
+end var
+end process
+
+end module
+
