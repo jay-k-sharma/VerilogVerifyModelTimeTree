@@ -1,0 +1,189 @@
+module uae_version2 with ==, !=, >= is
+
+------------------------------------------------------------------------
+--  Types
+------------------------------------------------------------------------ 
+ 
+ type page is activity, group, memo, event, calendar end type
+ type update is memoupdate, eventupdate, calendarupdate end type
+ type updates is list of update with empty, head, tail, member end type
+ type notification is n_eventupdate, n_eventstarting, n_memoupdate, n_calendarupdate end type
+ --type comment is comment(ID: nat) end type
+ type commentpage is event, memo end type
+ --type time is nat where time <= 24 end type
+
+------------------------------------------------------------------------
+--  Channels
+------------------------------------------------------------------------
+    
+channel P is (p: page) end channel
+channel U is (u: update) end channel
+channel N is (n: notification) end channel
+channel E is (ID: nat, t: nat, date: nat ) end channel
+channel C is (c: nat, p: commentpage ) end channel
+channel I is (ID: nat) end channel
+channel J is (CID: nat, UID: nat) end channel
+
+------------------------------------------------------------------------
+--  Processes
+------------------------------------------------------------------------
+
+process Activity [View, Display, CalendarUpdateActivity, MemoUpdateActivity, EventUpdateActivity: none] is
+ loop
+  select
+     View
+  []	
+	 Display	
+  []
+     CalendarUpdateActivity
+  []
+     MemoUpdateActivity
+  []
+     EventUpdateActivity
+  end select
+ end loop
+end process
+
+process Event[View, Display, UpdateActivity, UpdateEvent, DeleteEvent, Comment, Create: none, Debug: any] (myId: Nat) is
+  loop
+	  select
+		View
+	  []
+		Display
+	  []
+		Create
+	  []
+		UpdateActivity
+	  []
+		UpdateEvent
+	  [] 
+		UpdateActivity
+	  []
+		DeleteEvent
+	  []	
+		UpdateActivity
+	  []
+		Comment
+	  []
+		UpdateActivity
+	  []
+	    Debug (myID) -- Lina: please remove debug ones you add back the normal channel types.
+	  end select
+  end loop
+end process
+
+
+process Memo[View, Display, UpdateActivity,  Notify, DeleteMemo, Comment, Create, UpdateMemo: none] is
+  loop
+    select
+      View
+    [] Display
+    []  UpdateActivity
+    []  Notify
+    []  DeleteMemo
+    []  Comment
+    []  Create
+    []  UpdateMemo
+    end select
+  end loop
+end process
+
+
+process Calendar [CalendarUpdateActivity, View, Create, Display, DeleteCalendar, Search, Result, AddCalendar, UpdateCalendar, Join, Chat, CreateEvent, CreateMemo: none] is
+  loop
+     -- Calendar behabiour
+      select
+        CalendarUpdateActivity
+      []
+        View
+      []
+        Create
+      []
+        Display
+      []
+        DeleteCalendar
+      []
+        Search
+      []
+        Result
+      []
+       AddCalendar
+      []
+       UpdateCalendar
+      []
+        Join
+      []
+        Chat
+      []
+        CreateEvent
+      []
+        CreateMemo
+      end select
+  end loop
+end process
+
+process TimeTree [View, Display,  Notify, DeleteCalendar, Search, Result, AddCalendar, UpdateCalendar, Join, Chat, CreateEvent, Create, CreateMemo, CalendarUpdateActivity, MemoUpdateActivity, EventUpdateActivity, UpdateEvent, DeleteEvent, Comment, UpdateMemo, DeleteMemo: none, Debug: any] is
+  var eventID1, eventID2: nat in
+    -- initialisation
+    eventID1 := 0;
+    eventID2 := 1;
+    
+    par
+      -- LINA: if you have two user, or two event, they are concurrents, so it's as below, in the par no synchronizations, only outside of the par.
+      EventUpdateActivity, Create -> 
+      par 
+		 Event[View, Display, EventUpdateActivity, UpdateEvent, DeleteEvent, Comment, Create, Debug] (eventID1)
+	  ||
+		 Event[View, Display, EventUpdateActivity, UpdateEvent, DeleteEvent, Comment, Create, Debug] (eventID2)
+	  end par
+    ||
+      CalendarUpdateActivity, EventUpdateActivity, MemoUpdateActivity -> 
+      Activity [View, Display, CalendarUpdateActivity, MemoUpdateActivity, EventUpdateActivity]
+    || 
+      MemoUpdateActivity, CreateMemo -> 
+      Memo[View, Display, MemoUpdateActivity, Notify, DeleteMemo, Comment, CreateMemo, UpdateMemo]
+    || 
+     CalendarUpdateActivity, Create, CreateMemo -> Calendar [CalendarUpdateActivity, View, Create, Display, DeleteCalendar, Search, Result, AddCalendar, UpdateCalendar, Join, Chat, CreateEvent, CreateMemo]
+    end par
+  end var
+end process
+
+
+process User[View, Notify, UpdateEvent, DeleteEvent, DeleteCalendar, DeleteMemo, Comment, Search, Result, UpdateMemo,  AddCalendar, UpdateCalendar, Join, Chat, CreateEvent, CreateMemo: none] is
+  loop
+    select
+      View
+    [] Notify
+    []  UpdateEvent
+    []  DeleteEvent
+    []  DeleteCalendar
+    []  DeleteMemo
+    []  Comment
+    []  Search
+    []  Result
+    []  UpdateMemo
+    [] AddCalendar
+    []  UpdateCalendar
+    []  Join
+    []  Chat
+    []  CreateEvent
+    []  CreateMemo
+    end select
+  end loop
+end process
+
+
+process Main[View, Display, Notify, UpdateEvent, DeleteEvent, DeleteCalendar, DeleteMemo, Comment, Search, Result, UpdateMemo, AddCalendar, UpdateCalendar, Join, Chat, CreateEvent, CreateMemo, Create, CalendarUpdateActivity, MemoUpdateActivity, EventUpdateActivity: none, Debug: any] is 
+
+  par   
+   View, Notify, UpdateEvent, DeleteEvent, DeleteCalendar, DeleteMemo, Comment, Search, Result, UpdateMemo,  AddCalendar, UpdateCalendar, Join, Chat, CreateEvent, CreateMemo  ->
+   User[View, Notify, UpdateEvent, DeleteEvent, DeleteCalendar, DeleteMemo, Comment, Search, Result, UpdateMemo,  AddCalendar, UpdateCalendar, Join, Chat, CreateEvent, CreateMemo] 
+  ||
+  View, Notify, UpdateEvent, DeleteEvent, DeleteCalendar, DeleteMemo, Comment, Search, Result, UpdateMemo,  AddCalendar, UpdateCalendar, Join, Chat, CreateEvent, CreateMemo -> 
+   TimeTree [View, Display,  Notify, DeleteCalendar, Search, Result, AddCalendar, UpdateCalendar, Join, Chat, CreateEvent, Create, CreateMemo, CalendarUpdateActivity, MemoUpdateActivity, EventUpdateActivity, UpdateEvent, DeleteEvent, Comment, UpdateMemo, DeleteMemo, Debug]
+  end par
+end process
+
+end module
+
+
