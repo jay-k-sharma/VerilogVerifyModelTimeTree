@@ -1,0 +1,316 @@
+module uae_version3 with ==, !=, >= is
+
+------------------------------------------------------------------------
+--  Types
+------------------------------------------------------------------------ 
+ 
+ type page is activity, group, memo, event, calendar end type
+ type update is memoupdate, eventupdate, calendarupdate end type
+ type updates is list of update with empty, head, tail, member end type
+ type notification is n_eventupdate, n_eventstarting, n_memoupdate, n_calendarupdate end type
+ --type comment is comment(ID: nat) end type
+ type commentpage is event, memo end type
+ --type time is nat where time <= 24 end type
+
+------------------------------------------------------------------------
+--  Channels
+------------------------------------------------------------------------
+    
+channel P is (p: page) end channel
+channel U is (u: update) end channel
+channel N is (n: notification) end channel
+channel E is (ID: nat, t: nat, date: nat ) end channel
+channel C is (c: nat, p: commentpage ) end channel
+channel I is (ID: nat) end channel
+channel J is (CID: nat, UID: nat) end channel
+
+------------------------------------------------------------------------
+--  Processes
+------------------------------------------------------------------------
+
+process Activity [View, ActivityDisplay, CalendarUpdateActivity, MemoUpdateActivity, EventUpdateActivity: none] is
+ -- list of variable that keep the update for different Events, calendar, and Memo, display them when requested
+ loop
+  select
+     View
+  []	
+	 ActivityDisplay	
+  []
+     -- record the data in the variable with the ID
+     CalendarUpdateActivity
+  []
+     MemoUpdateActivity
+  []
+     EventUpdateActivity
+  end select
+ end loop
+end process
+
+process Event[View, EventDisplay, UpdateActivity, UpdateEvent: none, Desactivated: I, Comment: none, Activated: I] (myId: Nat) is
+
+ var eventActivated: bool in
+   -- initialization
+  eventActivated := false;
+  loop
+	  select
+	    var tempN: nat in
+		  Activated (?tempN) where tempN == myID;
+		  eventActivated := true
+		end var
+	  []
+	    var tempN: nat in
+		  Desactivated (?tempN) where tempN == myID;
+		  eventActivated := false
+		end var
+	  []
+	    if eventActivated then
+		  View
+		end if
+	  []
+	    if eventActivated then
+		  EventDisplay
+		end if
+	  []
+	    if eventActivated then
+		  UpdateEvent
+		end if
+	  []
+	    if eventActivated then
+		  UpdateActivity
+		end if
+	  []
+	    if eventActivated then
+		  Comment
+		end if
+	  end select
+  end loop
+ end var
+end process
+
+
+process Memo[View, MemoDisplay, UpdateActivity,  Notify, DeleteMemo, Comment, Create, UpdateMemo: none] is
+  loop
+    select
+        View
+    []  MemoDisplay
+    []  UpdateActivity
+    []  Notify
+    []  DeleteMemo
+    []  Comment
+    []  Create
+    []  UpdateMemo
+    end select
+  end loop
+end process
+
+
+process Calendar [CalendarUpdateActivity, View, Display, 
+                  Search, Result, UpdateCalendar, Join, Chat: none, CreateEvent, DeleteEvent, 
+                  CreateMemo: none, Activate, Desactivate, ActivateEvent, DesactivateEvent: I,
+                  EventView, EventDisplay, EventUpdateActivity, UpdateEvent, Comment: none] (myID: nat) is
+ var calendarActivated: bool, nbEvents, nbEventsActivated, eventID1, eventID2: nat in
+ 
+  -- initialization
+  calendarActivated := false;  
+  eventID1 := 0;
+  eventID2 := 1;
+  nbEvents := 2;
+  nbEventsActivated := 0;
+  
+  par
+     DesactivateEvent, ActivateEvent -> 
+      -- Main Calendar behaviour
+	  loop
+		  select
+			var tempN: Nat in
+			  -- activate the Calendar
+			  Activate (?tempN) where tempN == myID;
+			  calendarActivated := true
+			end var
+		  []
+			var tempN: Nat in
+			  -- activate the Calendar
+			  Desactivate (?tempN) where tempN == myID;
+			  calendarActivated := false
+			end var
+		  []
+			if calendarActivated then
+			 CalendarUpdateActivity
+			end if 
+		  []
+			if calendarActivated then
+			 View
+			end if 
+		  []
+			if calendarActivated then
+			 Display
+			end if 
+		  []
+			if calendarActivated then
+			 Search
+			end if 
+		  []
+			if calendarActivated then
+			 Result
+			end if 
+		  []
+			if calendarActivated then
+			 UpdateCalendar
+			end if 
+		  []
+			if calendarActivated then
+			 Join
+			end if 
+		  []
+			if calendarActivated then
+			 Chat
+			end if 
+		  []
+			if calendarActivated then
+			  DeleteEvent;
+			  if (nbEventsActivated > 0) then
+			   DesactivateEvent (nbEventsActivated - 1);
+			   nbEventsActivated := nbEventsActivated - 1
+			  end if
+			end if 
+		  []
+			if calendarActivated then
+			 CreateEvent;
+			 if nbEventsActivated < nbEvents then
+			   ActivateEvent (nbEventsActivated);
+			   nbEventsActivated := nbEventsActivated + 1
+			 end if
+			end if 
+		  []
+			if calendarActivated then
+			 CreateMemo
+			end if 
+		  end select
+	  end loop
+  ||
+      -- LINA: if you have two user, or two event, they are concurrents, so it's as below, in the par no synchronizations, only outside of the par.
+      DesactivateEvent, ActivateEvent -> 
+      par 
+		 Event[EventView, EventDisplay, EventUpdateActivity, UpdateEvent, 
+		       DesactivateEvent, Comment, ActivateEvent] (eventID1)
+	  ||
+		 Event[EventView, EventDisplay, EventUpdateActivity, UpdateEvent, 
+		       DesactivateEvent, Comment, ActivateEvent] (eventID2)
+	  end par
+  end par
+ end var
+end process
+
+
+
+process TimeTree [View, Display, EventDisplay, ActivityDisplay, MemoDisplay, 
+Notify, DeleteCalendar, Search, Result, AddCalendar, UpdateCalendar, Join, 
+Chat: none, CreateEvent, CreateCalendar, CreateMemo, CalendarUpdateActivity, 
+MemoUpdateActivity, EventUpdateActivity, UpdateEvent: none, DeleteEvent, Comment, 
+UpdateMemo, DeleteMemo: none, Activate, Desactivate, ActivateEvent, DesactivateEvent: I,
+EventView: none] is
+  var calendatID1: nat in
+    -- initialisation
+    calendatID1 := 0;
+    
+    par
+      loop
+        -- Handling different calendars 
+        select
+          CreateCalendar;
+          Activate (calendatID1)
+        []
+          DeleteCalendar;
+          Desactivate (calendatID1)
+        []
+          AddCalendar
+        end select
+      end loop
+    ||
+      CalendarUpdateActivity, EventUpdateActivity, MemoUpdateActivity -> 
+        Activity [View, ActivityDisplay, CalendarUpdateActivity, 
+                  MemoUpdateActivity, EventUpdateActivity]
+    || 
+      MemoUpdateActivity, CreateMemo -> 
+        Memo[View, MemoDisplay, MemoUpdateActivity, Notify, DeleteMemo, 
+            Comment, CreateMemo, UpdateMemo]
+    || 
+     CalendarUpdateActivity, CreateMemo, EventUpdateActivity -> 
+       Calendar [CalendarUpdateActivity, View, Display, 
+                 Search, Result, UpdateCalendar, Join, Chat, CreateEvent, DeleteEvent, 
+                 CreateMemo, Activate, Desactivate, ActivateEvent, DesactivateEvent,
+                 EventView, EventDisplay, EventUpdateActivity, UpdateEvent, Comment] (calendatID1)
+    end par
+  end var
+end process
+
+
+process User[View, Notify, UpdateEvent, DeleteEvent, DeleteCalendar, 
+             DeleteMemo, Comment, Search, Result, UpdateMemo,  AddCalendar, 
+             UpdateCalendar, Join, Chat, CreateCalendar, CreateEvent, 
+             CreateMemo, CalendarDisplay, EventDisplay, ActivityDisplay, 
+             MemoDisplay: none] is
+  loop
+    select
+        View
+    []  Notify
+    []  UpdateEvent
+    []  DeleteEvent
+    []  DeleteCalendar
+    []  DeleteMemo
+    []  Comment
+    []  Search
+    []  Result
+    []  UpdateMemo
+    []  AddCalendar
+    []  UpdateCalendar
+    []  Join
+    []  Chat
+    []  CreateCalendar
+    []  CreateEvent
+    []  CreateMemo
+    []  CalendarDisplay
+    []  EventDisplay
+    []  ActivityDisplay
+    []  MemoDisplay
+    end select
+  end loop
+end process
+
+
+process Main[View, CalendarDisplay, EventDisplay, ActivityDisplay, MemoDisplay, 
+Notify, UpdateEvent: none, DeleteEvent, DeleteCalendar, DeleteMemo, Comment, 
+Search, Result, UpdateMemo, AddCalendar, UpdateCalendar, Join, Chat, 
+CreateEvent, CreateMemo, CreateCalendar, CalendarUpdateActivity, MemoUpdateActivity: none, 
+EventUpdateActivity: none, Activate, Desactivate, ActivateEvent, DesactivateEvent: I, EventView: none] is 
+
+  par   
+   View, Notify, UpdateEvent, DeleteEvent, DeleteCalendar, DeleteMemo, 
+   Comment, Search, Result, UpdateMemo,  AddCalendar, UpdateCalendar, 
+   Join, Chat, CreateCalendar, CreateEvent, CreateMemo  ->
+     User[View, Notify, UpdateEvent, DeleteEvent, DeleteCalendar, 
+             DeleteMemo, Comment, Search, Result, UpdateMemo,  AddCalendar, 
+             UpdateCalendar, Join, Chat, CreateCalendar, CreateEvent, 
+             CreateMemo, CalendarDisplay, EventDisplay, ActivityDisplay, 
+             MemoDisplay] 
+  ||
+  
+    View, Notify, UpdateEvent, DeleteEvent, DeleteCalendar, DeleteMemo, 
+    Comment, Search, Result, UpdateMemo,  AddCalendar, UpdateCalendar, 
+    Join, Chat, CreateCalendar, CreateEvent, CreateMemo -> 
+     TimeTree [View, CalendarDisplay, EventDisplay, ActivityDisplay, 
+               MemoDisplay, Notify, DeleteCalendar, Search, Result, AddCalendar, 
+               UpdateCalendar, Join, Chat, CreateEvent, CreateCalendar, CreateMemo, 
+               CalendarUpdateActivity, MemoUpdateActivity, EventUpdateActivity, 
+               UpdateEvent, DeleteEvent, Comment, UpdateMemo, DeleteMemo,
+               Activate, Desactivate, ActivateEvent, DesactivateEvent, EventView]
+  end par
+end process
+
+end module
+
+-- Lina: Check below
+-- Important commands
+-- bcg_info -labels uae.bcg
+
+
