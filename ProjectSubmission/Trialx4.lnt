@@ -1,0 +1,1488 @@
+module Trialx4 with get, set, ==, !=, >= is
+------------------------------------------------------------------------
+--  Types
+------------------------------------------------------------------------
+type Event is 
+     Event (ID: Nat, Date: Nat, Year: Nat, TimeHour: Nat, TimeMin: Nat)
+end type
+type Memo is 
+     Memo (ID: Nat, MemoContent: Nat)
+end type
+type Activity is 
+     Activity (EventUpdate: bool, MemoUpdate: bool, ActivityInfo: String)
+end type
+
+type ListOfCalendarID is list of Nat with empty, head, tail, member end type
+type ListOfUserID is list of Nat with empty, head, tail, member end type
+type ListOfEvent is list of Event with empty, head, tail, member end type
+type ListOfMemo is list of Memo with empty, head, tail, member end type
+type ListOfActivity is list of Activity with empty, head, tail, member end type
+
+------------------------------------------------------------------------
+--  Channels
+------------------------------------------------------------------------
+channel N is (NatNum: Nat) end channel
+channel N2 is (NatNum1: Nat, NatNum2: Nat) end channel
+channel N3 is (NatNum1: Nat, NatNum2: Nat, NatNum3: Nat) end channel
+channel N2E is (NatNum1: Nat, NatNum2: Nat, EventNum1: Event) end channel
+channel N3M is (NatNum1: Nat, NatNum2: Nat, NatNum3: Nat, Message: String) end channel
+channel N2L is (NatNum1: Nat, NatNum2: Nat, ListOfA: ListOfActivity) end channel
+channel NMNMN is (NatNum1: Nat, Message1: string, NatNum2: Nat, Message2: string, NatNum3: Nat) end channel
+------------------------------------------------------------------------
+--  Processes
+------------------------------------------------------------------------
+
+   ------------------------------------------------------------------------------------------
+   -- CalenderManager is a process used to create and synchronize two instances of the 
+   -- Calender process. It assigns values to the process parameters of the calendar process.
+   -- 
+   -- The parallel composition enables both calendars to run concurrently and receive when a 
+   -- user executes a calendar gate.
+   -- Note: The second calendar instance has been commented out for a faster compilation 
+   --       time for verification.
+   ------------------------------------------------------------------------------------------
+
+    process CalendarManager [CalendarActivtyUpdate, EventActivityUpdate, MemoActivityUpdate: any,
+	   	             CreateCalendar: N2, DeleteCalendar: N2, RemovedFromCalendar: N2,
+	   	             InviteToCalendar: N3, InviteLinkToCalendar: N2,
+	   	             JoinCalendar: N2, LeaveCalendar: N2,
+	   	             Chat: N3,
+	   	             ViewCalendar: N2, DisplayCalendar: N2,
+	   	             CalendarNotify: N3,
+		             AddedToCalendar: N2,
+		             Search: N3, Result: N2E,
+	   	             CreateEvent: N2E, DeleteEvent: N3,
+	   	             ChangeEventDateAndTime: N2E,
+	   	             CommentOnEvent: N3M,
+	   	             ViewEvent: N3, DisplayEvent: N2E,
+	   	             EventNotify: NMNMN,
+	   	             CreateMemo: N3, DeleteMemo: N3,
+	   	             CommentOnMemo: N3M, UpdateMemo: N3,
+	   	             ViewMemo: N3, DisplayMemo: N3,
+	   	             MemoNotify: N3, Debug: any,
+	   	             ViewActivity: N2, DisplayActivity: N2L] is
+    	--par 
+              Calendar [CalendarActivtyUpdate, EventActivityUpdate, MemoActivityUpdate,
+	   	       	CreateCalendar, DeleteCalendar, RemovedFromCalendar,
+	   	       	InviteToCalendar, InviteLinkToCalendar,
+	   	       	JoinCalendar, LeaveCalendar,
+	   	       	Chat,
+	   	       	ViewCalendar, DisplayCalendar,
+	   	       	CalendarNotify,
+		      	AddedToCalendar,
+		      	Search, Result,
+	   	       	CreateEvent, DeleteEvent,
+	   	       	ChangeEventDateAndTime,
+	   	       	CommentOnEvent,
+	   	       	ViewEvent, DisplayEvent,
+	   	       	EventNotify,
+	   	       	CreateMemo, DeleteMemo,
+	   	       	CommentOnMemo, UpdateMemo,
+	   	       	ViewMemo, DisplayMemo,
+	   	       	MemoNotify, Debug,
+	   	       	ViewActivity, DisplayActivity] (1, 0, {}, {}, {}, {}, 1, 2, 2)
+	--||
+               --Calendar[CalendarActivtyUpdate, EventActivityUpdate, MemoActivityUpdate,
+	   	       	--CreateCalendar, DeleteCalendar, RemovedFromCalendar,
+	   	       	--InviteToCalendar, InviteLinkToCalendar,
+	   	       	--JoinCalendar, LeaveCalendar,
+	   	       	--Chat,
+	   	       	--ViewCalendar, DisplayCalendar,
+	   	       	--CalendarNotify,
+	   	       	--AddedToCalendar,
+	          	--Search, Result,
+	   	       	--CreateEvent, DeleteEvent,
+	   	       	--ChangeEventDateAndTime,
+	   	       	--CommentOnEvent,
+	   	       	--ViewEvent, DisplayEvent,
+	   	       	--EventNotify,
+	   	       	--CreateMemo, DeleteMemo,
+	   	       	--CommentOnMemo, UpdateMemo,
+	   	       	--ViewMemo, DisplayMemo,
+	   	       	--MemoNotify, Debug,
+	              --ViewActivity, DisplayActivity] (2, 0, {}, {}, {}, {}, 1, 2, 2)
+      --end par
+    end process
+
+   ------------------------------------------------------------------------------------------
+   -- UserManager is a process used to instantiate and synchronize two instances of the 
+   -- User process allowing both Users to run concurrently and receive when a calendar executes a 
+   -- user gate.
+   -- It assigns values to the process parameters of the User process.
+   ------------------------------------------------------------------------------------------
+ 
+    process UserManager [SignUp, SignIn, SignOut: N,
+   	          	CreateCalendar: N2, DeleteCalendar: N2, RemovedFromCalendar: N2,
+   	          	InviteToCalendar: N3, InviteLinkToCalendar: N2,
+   	          	JoinCalendar: N2, LeaveCalendar: N2,
+   	          	Chat: N3, 
+   	          	ViewCalendar: N2, DisplayCalendar: N2,
+			CalendarNotify: N3,
+			AddedToCalendar: N2,
+			Search: N3, Result: N2E,
+			CreateEvent: N2E, DeleteEvent: N3,
+			ChangeEventDateAndTime: N2E,
+			CommentOnEvent: N3M,
+			ViewEvent: N3, DisplayEvent:N2E,
+			EventNotify: NMNMN,
+			CreateMemo: N3, DeleteMemo: N3,
+	   	        CommentOnMemo: N3M, UpdateMemo: N3,
+	   	        ViewMemo: N3, DisplayMemo: N3,
+	   	        MemoNotify: N3, Debug: any,
+	   	        ViewActivity: N2, DisplayActivity: N2L] is	 	 
+    	   par
+		  User [SignUp, SignIn, SignOut,
+			CreateCalendar, DeleteCalendar, RemovedFromCalendar,
+			InviteToCalendar, InviteLinkToCalendar,
+			JoinCalendar, LeaveCalendar,
+			Chat,
+			ViewCalendar, DisplayCalendar,
+			CalendarNotify,
+			AddedToCalendar,
+			Search, Result,
+			CreateEvent, DeleteEvent,
+			ChangeEventDateAndTime,
+			CommentOnEvent,
+			ViewEvent, DisplayEvent,
+			EventNotify,
+			CreateMemo, DeleteMemo,
+			CommentOnMemo, UpdateMemo,
+			ViewMemo, DisplayMemo,
+			MemoNotify, Debug,
+			ViewActivity, DisplayActivity] (1, {}, {}, 1, 1, 1) -- user 1 with no calendars currently
+		||
+             	  User [SignUp, SignIn, SignOut,
+			CreateCalendar, DeleteCalendar, RemovedFromCalendar,
+			InviteToCalendar, InviteLinkToCalendar,
+			JoinCalendar, LeaveCalendar,
+			Chat,
+			ViewCalendar, DisplayCalendar,
+			CalendarNotify,
+			AddedToCalendar,
+			Search, Result,
+			CreateEvent, DeleteEvent,
+			ChangeEventDateAndTime,
+			CommentOnEvent,
+			ViewEvent, DisplayEvent,
+			EventNotify,
+			CreateMemo, DeleteMemo,
+			CommentOnMemo, UpdateMemo,
+			ViewMemo, DisplayMemo,
+			MemoNotify, Debug, 
+			ViewActivity, DisplayActivity] (2, {}, {}, 1, 1, 1) -- user 2 with no calendars currently
+          	end par
+    	end process  
+    	
+
+   ------------------------------------------------------------------------------------------
+   -- Calendar is a process modeling the features of a calendar in the TimeTree app. 
+   -- 
+   -- It manages events, memos and activities and performs actions such as creating, deleting, 
+   -- updating and commenting. It also allows users to send invites and join the calendar 
+   -- as well as chat with each other.
+   -- The calender process performs verifications before allowing changes so that only 
+   -- users that are members have permission.
+   --
+   -- Each action is documented in activities as a stack that only keeps the two 
+   -- most recent changes and a notification is sent to the users that did not make the change.
+   ------------------------------------------------------------------------------------------
+ 
+       process Calendar[CalendarActivtyUpdate, EventActivityUpdate, MemoActivityUpdate: any,
+	   	      	CreateCalendarReceive: N2, DeleteCalendarReceive: N2,
+	   	      	RemovedFromCalendar: N2,
+	   	      	InviteToCalendarReceive: N3, InviteLinkToCalendar: N2,
+	   	      	JoinCalendarReceive: N2, LeaveCalendarReceive: N2,
+	   	      	ChatReceive: N3,
+	   	      	ViewCalendarReceive: N2, DisplayCalendar: N2,
+	   	      	CalendarNotify: N3,
+		     	AddedToCalendar: N2,
+		     	SearchReceive: N3, Result: N2E,
+	   	      	CreateEventReceive: N2E, DeleteEventReceive: N3,
+	   	      	ChangeEventDateAndTimeReceive: N2E,
+	   	      	CommentOnEventReceive: N3M,
+	   	      	ViewEventReceive: N3, DisplayEvent: N2E,
+	   	      	EventNotify: NMNMN,
+	   	      	CreateMemoReceive: N3, DeleteMemoReceive: N3,
+	   	      	CommentOnMemoReceive: N3M, UpdateMemoReceive: N3,
+	   	      	ViewMemoReceive: N3, DisplayMemo: N3,
+	   	      	MemoNotify: N3, Debug: any,
+	   	      	ViewActivityReceive: N2, DisplayActivity: N2L] 
+	   	      	                              (CalendarID: Nat, in var
+		   	                               MakerID: Nat, in var
+		   	                               ListOfUID: ListOfUserID, in var
+		   	                               ListOfE: ListOfEvent, in var
+		   	                               ListOfM: ListOfMemo, in var
+		   	                               ListOfA: ListOfActivity, in var
+		   	                               nbActivations: Nat, in var 	-- > Limits the number of times a calender is activated.
+		   	                               nbUsersLeftToJoin: Nat, in var   -- > Limits the number of user that can join the calender.
+						       AllowedEvents: Nat) is		-- > Limits the number of events that can be exist at once.
+      	var ActiveCal: Nat in
+		-- initialisations
+        	ActiveCal := 0;
+        	loop
+   	 	select
+   	 	-- --------------------------------------------------------
+   	 	-- From User to Calendar (Basic)
+   	   	if (ActiveCal == 0) and (MakerID == 0) and (nbActivations != 0) then
+   	     	  var UserID: Nat, CalID: Nat in
+                  CreateCalendarReceive(?UserID, ?CalID) where CalID == CalendarID;
+                  -- calendar activated if not created and the CalID input is the ID of cal instance.
+                  -- maker of calendar must not exist prior to user creating calendar.
+                    if((MakerID == 0) and (CalendarID == CalID)) then
+                      ActiveCal := CalendarID;
+                      MakerID := UserID;
+                      ListOfUID := cons(MakerID, ListOfUID);
+                      nbUsersLeftToJoin := nbUsersLeftToJoin - 1
+                    end if
+   	     	  end var   	    	 
+   	   	end if
+   	 	[]
+   	   	if (ActiveCal != 0) then
+   	     	  if(ActiveCal == CalendarID) then
+   	       	    var TCalID: Nat, TUserID: Nat in
+   	            DeleteCalendarReceive(?TUserID, ?TCalID) where ((TCalID == CalendarID) and (TUserID == MakerID));
+	              if ((ActiveCal == TCalID) and (MakerID == TUserID)) then
+		        ActiveCal := 0;
+			ListOfE := {};
+			ListOfM := {};
+			ListOfA := {};
+			var CurrentList: ListOfUserID, CurrentUserID: Nat in
+			  CurrentList := ListOfUID;
+			  while (empty(CurrentList) == false) loop
+			    CurrentUserID := head(CurrentList);
+			    RemovedFromCalendar(CurrentUserID, TCalID);
+			    CurrentList := tail(CurrentList);
+			    nbUsersLeftToJoin := nbUsersLeftToJoin + 1
+			  end loop
+			end var;
+			-- Lina NEW: to limit number of Activation
+			nbActivations := nbActivations - 1;
+			MakerID := 0;
+			ListOfUID := {};
+			if nbActivations == 0 then
+			  i -- Lina NEW to avoid deadlock
+			end if
+		       end if
+   	       	     end var
+   	     	   end if
+   	   	end if
+   	 	[]
+   	   	if (ActiveCal != 0) then
+   	   	  if(ActiveCal == CalendarID) then
+   	   	    var UserID: Nat, InvitedUserID: Nat, CalID: Nat in
+   	   	      InviteToCalendarReceive(?UserID, ?InvitedUserID, ?CalID)  where 
+   	   	      ((CalID != 0) and (CalID == CalendarID) and
+   	   	      (UserID != InvitedUserID) and
+   	   	      (member(UserID, ListOfUID) == true) and
+   	   	      (member(InvitedUserID, ListOfUID) == false));
+   	   	      if((MakerID != 0) and (UserID != 0)) then
+   	   	          InviteLinkToCalendar(InvitedUserID, CalID)
+   	   	      end if
+   	   	    end var
+   	   	  end if
+   	   	end if   	   	  	    	  	  	  	 
+   	 	[]
+   	   	if (ActiveCal != 0) then
+   	   	  if(ActiveCal == CalendarID) then
+   	   	    var UserID: Nat, CalID: Nat in
+   	   	      JoinCalendarReceive(?UserID, ?CalID) where ((CalID == CalendarID) and (UserID != MakerID) and
+   	   	                                                 (nbUsersLeftToJoin > 0));
+   	   	      if(member(UserID, ListOfUID) == false) then
+   	   	        ListOfUID := cons(UserID, ListOfUID);
+   	   	        AddedToCalendar(UserID, CalID);
+   	   	        nbUsersLeftToJoin := nbUsersLeftToJoin - 1	   	        
+   	   	      end if
+   	   	    end var
+   	   	  end if
+   	   	end if
+   	 	[]
+   	   	if (ActiveCal != 0) then
+   	   	  if(ActiveCal == CalendarID) then
+   	   	    var UserID: Nat, CalID: Nat in
+   	   	      LeaveCalendarReceive(?UserID, ?CalID) where ((CalID == CalendarID) and 
+   	   	                                                  ((member(UserID, ListOfUID)) == true));
+   	   	      if(UserID == MakerID) then
+   	   	        var CurrentList: ListOfUserID, CurrentUserID: Nat in
+			  CurrentList := ListOfUID;
+			  while (empty(CurrentList) == false) loop
+			    CurrentUserID := head(CurrentList);
+			    RemovedFromCalendar(CurrentUserID, CalID);
+			    CurrentList := tail(CurrentList);
+			    nbUsersLeftToJoin := nbUsersLeftToJoin + 1
+			  end loop;
+			  nbActivations := nbActivations - 1;
+			  ListOfUID := {};
+			  MakerID := 0;
+			  if nbActivations == 0 then
+			    i -- Lina NEW to avoid deadlock
+			  end if
+			end var
+   	   	      end if;
+   	   	      if(UserID != MakerID) then
+   	   	        var NewList: ListOfUserID,  
+		            CurrentList: ListOfUserID,
+		            CurrentID: Nat in
+		            NewList := {};
+		            CurrentList := ListOfUID;
+		            CurrentID := 0;
+		            while (empty(CurrentList) == false) loop
+		              CurrentID := head(CurrentList);
+		              if (CurrentID != UserID) then
+		                NewList := cons(CurrentID, NewList)
+		              end if;
+		            CurrentList := tail(CurrentList)
+		            end loop;
+		            ListOfUID := NewList
+	                end var;
+   	   	        RemovedFromCalendar(UserID, CalID);
+   	   	        nbUsersLeftToJoin := nbUsersLeftToJoin + 1
+   	   	      end if 
+   	   	    end var
+   	   	  end if
+   	   	end if
+   	 	[]
+   	   	if (ActiveCal != 0) then
+   	   	  if(ActiveCal == CalendarID) then
+   	   	    var UserID: Nat, CalID: Nat, MessageContent: Nat in
+   	   	      ChatReceive(?UserID, ?CalID, ?MessageContent) where ((member(UserID, ListOfUID) == true) and 
+   	   	                                                          (CalID == CalendarID));
+   	   	      var CurrentList: ListOfUserID, CurrentUserID: Nat in
+			  CurrentList := ListOfUID;
+			  while (empty(CurrentList) == false) loop
+			    CurrentUserID := head(CurrentList);
+			    if(CurrentUserID != UserID) then
+			      CalendarNotify(CurrentUserID, CalID, MessageContent)
+			    end if;
+			    CurrentList := tail(CurrentList)
+			  end loop
+	              end var
+   	   	    end var
+   	   	  end if
+   	   	end if
+   	 	[]
+   	   	if (ActiveCal != 0) then
+   	   	  if(ActiveCal == CalendarID) then
+   	   	    var UserID: Nat, CalID: Nat in
+   	   	      ViewCalendarReceive(?UserID, ?CalID) where ((member(UserID, ListOfUID) == true) and 
+   	   	                                                  (CalID == CalendarID));
+   	   	      DisplayCalendar(UserID, CalID)
+   	   	    end var
+   	   	  end if
+   	   	end if
+            	-- --------------------------------------------------------
+   	 	-- From Calendar to User (Basic)
+   	 	[]
+   	   	if (ActiveCal != 0) then
+   	   	  if(ActiveCal == CalendarID) then
+   	   	    var UserID: Nat, CalID: Nat, EventID: Nat in
+   	     	      SearchReceive(?UserID, ?CalID, ?EventID) where ((member(UserID, ListOfUID)) and 
+   	     	                                                     (CalID == CalendarID));
+   	     	      -- Event (ID: Nat, Date: Nat, Year: Nat, TimeHour: Nat, TimeMin: Nat)
+   	     	      var CurrentList: ListOfEvent, 
+   	     	          CurrentEvent: Event, 
+   	     	          EventExists: bool, 
+   	     	          PlaceholderEvent: Event in
+			  CurrentList := ListOfE;
+			  EventExists := false;
+			  PlaceholderEvent := Event(0, 0, 0, 0, 0);
+			  while (empty(CurrentList) == false) loop
+			    CurrentEvent := head(CurrentList);
+			    if(CurrentEvent.ID == EventID) then
+			      EventExists := true;
+			      PlaceholderEvent := CurrentEvent
+			    end if;
+			    CurrentList := tail(CurrentList)
+			  end loop;
+			  if(EventExists == true) then
+			    Result(UserID, CalID, PlaceholderEvent)
+			  end if;
+			  if(EventExists == false) then
+			    PlaceholderEvent := Event(0, 0, 0, 0, 0);
+			    Result(UserID, CalID, PlaceholderEvent)
+			  end if
+	              end var
+   	     	    end var
+   	     	  end if
+   	   	end if
+   	 	[]
+   	 	-- --------------------------------------------------------
+   	 	-- --------------------------------------------------------
+   	 	-- --------------------------------------------------------
+   	 	-- From User to Calendar (Event)
+   	   	if (ActiveCal != 0) and (AllowedEvents > 0)then
+		  var UID: Nat, CalID: Nat, EventId: Nat, newEvent: Event in		
+   	     	   CreateEventReceive(?UID, ?CalID, ?newEvent) where ((CalID ==  CalendarID) and 
+								     (member(UID, ListOfUID) == true));
+		   var CurrentList: ListOfEvent, CurrentEvent: Event, EventExists: bool, ActivityToAdd: Activity in
+			  CurrentList := ListOfE;
+			  EventExists := false;
+
+			  while (empty(CurrentList) == false) loop
+			    CurrentEvent := head(CurrentList);
+			    if(CurrentEvent.ID == newEvent.ID) then
+			      EventExists := true
+			    end if;
+			    CurrentList := tail(CurrentList)
+			  end loop;
+
+			  if(EventExists == false) then			    	
+		   		ListOfE := cons(newEvent, ListOfE);
+		   		AllowedEvents := AllowedEvents - 1;
+				EventActivityUpdate("user ", UID, " created", "event ", newEvent);
+				ActivityToAdd := Activity(true, false, "Event created.");
+			        ListOfA := cons(ActivityToAdd, ListOfA)
+			  end if;
+
+			  if (EventExists == false) then
+			  var CurrentUserList: ListOfUserID, CurrentUserID: Nat in
+			        CurrentUserList := ListOfUID;
+
+			        while (empty(CurrentUserList) == false) loop
+			          CurrentUserID := head(CurrentUserList);
+			          if(CurrentUserID != UID) then
+			            EventNotify(CurrentUserID,"User", UID, " created a new event in calender", CalID)
+			          end if;
+			          CurrentUserList := tail(CurrentUserList)
+			        end loop
+	                    end var
+			  end if
+	              end var
+		   		   
+		  end var
+		end if
+   	 	[]
+   	   	if ((ActiveCal != 0) and (ListOfE != {})) then
+		  var UID: Nat, CalID: Nat, EventId: Nat in
+		    DeleteEventReceive(?UID, ?CalID, ?EventID) where ((CalID ==  CalendarID) and 
+								     (member(UID, ListOfUID) == true));
+		    var CurrentList: ListOfEvent, FinalList: ListOfEvent, InitialList: ListOfEvent, CurrentEvent: Event, EventExists: bool, ActivityToAdd: Activity in
+			  CurrentList := ListOfE;
+			  InitialList := ListOfE;
+			  FinalList := {};
+			  EventExists := false;
+
+			  while (empty(CurrentList) == false) loop
+			    CurrentEvent := head(CurrentList);
+
+			    if(CurrentEvent.ID != EventID) then
+			      FinalList := cons(CurrentEvent, FinalList)
+			    end if;
+
+			    if(CurrentEvent.ID == EventID) then
+			      EventExists := true
+			    end if;
+
+			    CurrentList := tail(CurrentList)			    
+			  end loop;
+
+			  ListOfE := FinalList;
+			  if(EventExists == true) then
+			      AllowedEvents := AllowedEvents + 1;
+			      EventActivityUpdate("user ", UID, " deleted", "event ", EventID, "initial list: ", InitialList, ", Final list: ", ListofE);
+				ActivityToAdd := Activity(true, false, "Event Deleted.");
+			        ListOfA := cons(ActivityToAdd, ListOfA);
+				
+			  var CurrentUserList: ListOfUserID, CurrentUserID: Nat in
+			        CurrentUserList := ListOfUID;
+
+			        while (empty(CurrentUserList) == false) loop
+			          CurrentUserID := head(CurrentUserList);
+			          if(CurrentUserID != UID) then
+			            EventNotify(CurrentUserID,"User", UID, " deleted an event in calender", CalID)
+			          end if;
+			          CurrentUserList := tail(CurrentUserList)
+			        end loop
+	                    end var
+			  end if		  
+
+	              end var
+		  end var
+   	   	end if
+   	 	[]
+   	   	if ((ActiveCal != 0) and (ListOfE != {})) then
+		  var UID: Nat, CalID: Nat, EventId: Nat, newEvent: Event in		
+   	     	   ChangeEventDateAndTimeReceive(?UID, ?CalID, ?newEvent) where ((CalID ==  CalendarID) and 
+								     		(member(UID, ListOfUID) == true));
+		   var CurrentList: ListOfEvent, FinalList: ListOfEvent, InitialList: ListOfEvent, CurrentEvent: Event, EventExists: bool, ActivityToAdd: Activity in
+			  CurrentList := ListOfE;
+			  InitialList := ListOfE;
+			  FinalList := {};
+			  EventExists := false;
+
+			  while (empty(CurrentList) == false) loop
+			    CurrentEvent := head(CurrentList);
+
+			    if(CurrentEvent.ID != newEvent.ID) then
+			      FinalList := cons(CurrentEvent, FinalList)
+			    end if;
+
+			    if(CurrentEvent.ID == newEvent.ID) then
+			      	EventExists := true;
+			      	FinalList := cons(newEvent, FinalList)
+			    end if;
+
+			    CurrentList := tail(CurrentList)			    
+			  end loop;
+
+			  ListOfE := FinalList;
+			  if(EventExists == true) then
+			      EventActivityUpdate("user ", UID, " Updated Event ", newEvent.ID, " initial list: ", InitialList," Final list: ", ListofE);
+			      ActivityToAdd := Activity(true, false, "Event Updated.");
+			      ListOfA := cons(ActivityToAdd, ListOfA);
+
+				var CurrentUserList: ListOfUserID, CurrentUserID: Nat in
+			        CurrentUserList := ListOfUID;
+
+			        while (empty(CurrentUserList) == false) loop
+			          CurrentUserID := head(CurrentUserList);
+			          if(CurrentUserID != UID) then
+			            EventNotify(CurrentUserID,"User", UID, " updated an event in calender", CalID)
+			          end if;
+			          CurrentUserList := tail(CurrentUserList)
+			        end loop
+	                    end var
+			  end if		  
+
+	              end var
+		   		   
+		  end var
+   	     	
+   	   	end if
+   	 	[]
+   	   	if ((ActiveCal != 0) and (ListOfE != {})) then
+		 var UID: Nat, CalID: Nat, EventId: Nat, comment: string in		
+   	     	   CommentOnEventReceive(?UID, ?CalID, ?EventID, ?comment) where ((CalID ==  CalendarID) and 
+								     (member(UID, ListOfUID) == true));
+		   var CurrentList: ListOfEvent, CurrentEvent: Event, EventExists: bool, ActivityToAdd: Activity in
+			  CurrentList := ListOfE;
+			  EventExists := false;
+
+			  while (empty(CurrentList) == false) loop
+			    CurrentEvent := head(CurrentList);
+			    if(CurrentEvent.ID == EventID) then
+			      EventExists := true;
+			      EventActivityUpdate("User ", UID, "commented on event ", EventID);
+			      ActivityToAdd := Activity(true, false, "Event commented on.");
+			      ListOfA := cons(ActivityToAdd, ListOfA)
+			    end if;
+			    CurrentList := tail(CurrentList)
+			  end loop;
+
+
+			  if (EventExists == true) then 
+				var CurrentUserList: ListOfUserID, CurrentUserID: Nat in
+			        CurrentUserList := ListOfUID;
+
+			         while (empty(CurrentUserList) == false) loop
+			          CurrentUserID := head(CurrentUserList);
+			          if(CurrentUserID != UID) then
+			            EventNotify(CurrentUserID,"User", UID, " commented on an event in calender", CalID)
+			          end if;
+			          CurrentUserList := tail(CurrentUserList)
+			        end loop
+	                       end var
+			end if
+	              end var
+		   		   
+		  end var
+   	     	
+   	   	end if
+   	 	[]
+   	   	if ((ActiveCal != 0) and (ListOfE != {})) then
+		  var UID: Nat, CalID: Nat, EventId: Nat, comment: string in		
+   	     	   ViewEventReceive(?UID, ?CalID, ?EventID) where ((CalID ==  CalendarID) and 
+								     (member(UID, ListOfUID) == true));
+		   var CurrentList: ListOfEvent, CurrentEvent: Event, EventExists: bool in
+			  CurrentList := ListOfE;
+			  EventExists := false;
+
+			  while (empty(CurrentList) == false) loop
+			    CurrentEvent := head(CurrentList);
+			    if(CurrentEvent.ID == EventID) then
+			      EventExists := true;
+			      DisplayEvent(UID, CalID, CurrentEvent)
+			    end if;
+			    CurrentList := tail(CurrentList)
+			  end loop
+
+	              end var
+		   		   
+		  end var
+   	   	end if
+   	 	[]
+   	 	-- From User to Calendar (Memo)
+   	   	if (ActiveCal != 0) then
+   	   	  if(ActiveCal == CalendarID) then
+   	   	    var UserID: Nat, CalID: Nat, MemoID: Nat in
+   	   	      CreateMemoReceive(?UserID, ?CalID, ?MemoID) where ((member(UserID, ListOfUID) == true) and 
+   	   	                                                         (CalID == CalendarID));
+   	   	      var CurrentList: ListOfMemo, 
+   	     	          CurrentMemo: Memo, 
+   	     	          MemoExists: bool, 
+   	     	          MemoToCreate: Memo,
+   	     	          ActivityToAdd: Activity in
+			  CurrentList := ListOfM;
+			  MemoExists := false;
+			  while (empty(CurrentList) == false) loop
+			    CurrentMemo := head(CurrentList);
+			    if(CurrentMemo.ID == MemoID) then
+			      MemoExists := true
+			    end if;
+			    CurrentList := tail(CurrentList)
+			  end loop;
+			  
+			  if(MemoExists == false) then
+			    MemoToCreate := Memo(MemoID, 0);
+			    ListOfM := cons(MemoToCreate, ListOfM);
+			    MemoActivityUpdate("Created by user with UserID: ", UserID, 
+			                       "Created in calendar with CalendarID:", CalID,
+			                       "Created memo with MemoID: ", MemoID);
+			    ActivityToAdd := Activity(false, true, "Memo created.");
+			    ListOfA := cons(ActivityToAdd, ListOfA);
+			    var CurrentUserList: ListOfUserID, 
+			        CurrentUserID: Nat, 
+			        MemoNotificationContent: Nat in
+			        CurrentUserList := ListOfUID;
+			        MemoNotificationContent := MemoID;
+			        while (empty(CurrentUserList) == false) loop
+			          CurrentUserID := head(CurrentUserList);
+			          if(CurrentUserID != UserID) then
+			            MemoNotify(CurrentUserID, CalID, MemoNotificationContent)
+			          end if;
+			          CurrentUserList := tail(CurrentUserList)
+			        end loop
+	                    end var
+			  end if
+	              end var
+   	   	    end var
+   	   	  end if
+   	   	end if
+   	 	[]
+   	   	if ((ActiveCal != 0) and (ListOfM != {})) then
+   	   	  if(ActiveCal == CalendarID) then
+   	   	    var UserID: Nat, CalID: Nat, MemoID: Nat in
+   	   	      DeleteMemoReceive(?UserID, ?CalID, ?MemoID) where ((member(UserID, ListOfUID) == true) and 
+   	   	                                                         (CalID == CalendarID));
+   	   	      var CurrentList: ListOfMemo, 
+			  CurrentMemo: Memo, 
+			  MemoExists: bool in
+			  CurrentList := ListOfM;
+			  MemoExists := false;
+			  
+			  -- this confirms if memo that wants to be deleted exists and
+			  -- retreives the memo to be deleted
+			  while (empty(CurrentList) == false) loop
+			    CurrentMemo := head(CurrentList);
+			    if(CurrentMemo.ID == MemoID) then
+			      MemoExists := true
+			    end if;
+			    CurrentList := tail(CurrentList)
+			  end loop;
+			  
+			  -- this physically deletes the existing memo from the list of memos for this calendar 
+			  if(MemoExists == true) then
+			    var CurrentMemoList: ListOfMemo,
+				NewMemoList: ListOfMemo,
+				CurrentMemoObj: Memo, 
+				MemoNotificationContent: Nat,
+   	     	                ActivityToAdd: Activity in 
+				CurrentMemoList := ListOfM;
+				NewMemoList := {};
+				MemoNotificationContent := UserID;
+				
+				while (empty(CurrentMemoList) == false) loop
+				  CurrentMemoObj := head(CurrentMemoList);
+				  if(CurrentMemoObj.ID != MemoID) then
+				    NewMemoList := cons(CurrentMemoObj, CurrentMemoList)
+				  end if;
+				  CurrentMemoList := tail(CurrentMemoList)
+				end loop;
+				
+				ListOfM := NewMemoList;
+				MemoActivityUpdate("Deleted by user with UserID: ", UserID, 
+			                           "Existing in calendar with CalendarID:", CalID,
+			                           "Removed memo with MemoID: ", MemoID);
+			        ActivityToAdd := Activity(false, true, "Memo deleted.");
+			        ListOfA := cons(ActivityToAdd, ListOfA);
+			        
+				-- this notifies all users that did not delete the memo, that it has been deleted
+				var CurrentUserList: ListOfUserID, 
+				    CurrentUserID: Nat in
+				    CurrentUserList := ListOfUID;
+				    while (empty(CurrentUserList) == false) loop
+				      CurrentUserID := head(CurrentUserList);
+				      if(CurrentUserID != UserID) then
+					MemoNotify(CurrentUserID, CalID, MemoNotificationContent)
+				      end if;
+				      CurrentUserList := tail(CurrentUserList)
+				    end loop
+				end var
+			    end var
+			  end if
+			end var
+   	   	    end var
+   	   	  end if
+   	   	end if
+   	 	[]
+   	   	if ((ActiveCal != 0) and (ListOfM != {})) then
+   	   	  if(ActiveCal == CalendarID) then
+   	   	    var UserID: Nat, CalID: Nat, MemoID: Nat, CommentContent: String in 
+   	   	      CommentOnMemoReceive(?UserID, ?CalID, ?MemoID, ?CommentContent) 
+   	   	                    where ((member(UserID, ListOfUID) == true) and (CalID == CalendarID));
+   	   	      var CurrentList: ListOfMemo, 
+			  CurrentMemo: Memo, 
+			  MemoExists: bool in
+			  CurrentList := ListOfM;
+			  MemoExists := false;
+			  
+			  -- this confirms if memo that wants to be commented on exists 
+			  while (empty(CurrentList) == false) loop
+			    CurrentMemo := head(CurrentList);
+			    if(CurrentMemo.ID == MemoID) then
+			      MemoExists := true
+			    end if;
+			    CurrentList := tail(CurrentList)
+			  end loop;
+			  
+			  -- this physically comments the existing memo from the list of memos for this calendar 
+			  if(MemoExists == true) then
+			    var MemoNotificationContent: Nat,
+   	     	                ActivityToAdd: Activity in 
+				MemoNotificationContent := UserID;
+				
+				MemoActivityUpdate("Comment made by user with UserID: ", UserID, 
+			                           "Existing in calendar with CalendarID:", CalID,
+			                           "On memo with MemoID", CommentContent);
+			        ActivityToAdd := Activity(false, true, "Memo commented on.");
+			        ListOfA := cons(ActivityToAdd, ListOfA);
+			        
+				-- this notifies all users that did not comment on the memo, that it has been commented
+				var CurrentUserList: ListOfUserID, 
+				    CurrentUserID: Nat in
+				    CurrentUserList := ListOfUID;
+				    while (empty(CurrentUserList) == false) loop
+				      CurrentUserID := head(CurrentUserList);
+				      if(CurrentUserID != UserID) then
+					MemoNotify(CurrentUserID, CalID, MemoNotificationContent)
+				      end if;
+				      CurrentUserList := tail(CurrentUserList)
+				    end loop
+				end var
+			    end var
+			  end if
+			end var
+   	   	    end var
+   	   	  end if
+   	   	end if
+   	 	[]
+   	   	if ((ActiveCal != 0) and (ListOfM != {})) then
+   	   	  if(ActiveCal == CalendarID) then
+   	   	    var UserID: Nat, CalID: Nat, MemoID: Nat in
+   	   	      UpdateMemoReceive(?UserID, ?CalID, ?MemoID) where ((member(UserID, ListOfUID) == true) and 
+   	   	                                                         (CalID == CalendarID));
+   	   	      var CurrentList: ListOfMemo, 
+			  CurrentMemo: Memo, 
+			  MemoExists: bool,
+			  OldData: Nat, 
+			  NewData: Nat in
+			  CurrentList := ListOfM;
+			  MemoExists := false;
+			  OldData := 0;
+			  NewData := 0;
+			  -- this confirms if memo that wants to be updated exists and updates it's content
+			  while (empty(CurrentList) == false) loop
+			    CurrentMemo := head(CurrentList);
+			    if(CurrentMemo.ID == MemoID) then
+			      MemoExists := true;
+			      OldData := CurrentMemo.MemoContent;
+			      NewData := OldData + 1
+			    end if;
+			    CurrentList := tail(CurrentList)
+			  end loop;
+			  
+			  -- this physically comments the existing memo from the list of memos for this calendar 
+			  if(MemoExists == true) then
+			    var CurrentMemoList: ListOfMemo,
+				NewMemoList: ListOfMemo,
+				CurrentMemoObj: Memo,
+				NewMemoObj: Memo, 
+				MemoNotificationContent: Nat,
+				ActivityToAdd: Activity in  
+				CurrentMemoList := ListOfM;
+				NewMemoList := {};
+				MemoNotificationContent := UserID;
+				
+				-- removes the old version of the memo
+				while (empty(CurrentMemoList) == false) loop
+				  CurrentMemoObj := head(CurrentMemoList);
+				  if(CurrentMemoObj.ID != MemoID) then
+				    NewMemoList := cons(CurrentMemoObj, CurrentMemoList)
+				  end if;
+				  CurrentMemoList := tail(CurrentMemoList)
+				end loop;
+				
+				-- adds the new version of the memo
+				ListOfM := NewMemoList;
+				NewMemoObj := Memo(MemoID, NewData);
+				ListOfM := cons(NewMemoObj, ListOfM);
+				MemoActivityUpdate("Memo update made by user with UserID: ", UserID, 
+			                           "Existing in calendar with CalendarID:", CalID,
+			                           "On memo with MemoID", MemoID, 
+			                           "Old memo data:", OldData,
+			                           "New memo data:", NewData);
+			        ActivityToAdd := Activity(false, true, "Memo updated.");
+			        ListOfA := cons(ActivityToAdd, ListOfA);
+			        
+				-- this notifies all users that did not update the memo, that it has been updated
+				var CurrentUserList: ListOfUserID, 
+				    CurrentUserID: Nat in
+				    CurrentUserList := ListOfUID;
+				    while (empty(CurrentUserList) == false) loop
+				      CurrentUserID := head(CurrentUserList);
+				      if(CurrentUserID != UserID) then
+					MemoNotify(CurrentUserID, CalID, MemoNotificationContent)
+				      end if;
+				      CurrentUserList := tail(CurrentUserList)
+				    end loop
+				end var
+			    end var
+			  end if
+			end var
+   	   	    end var
+   	   	  end if
+   	   	end if
+   	 	[]
+   	   	if ((ActiveCal != 0) and (ListOfM != {})) then
+   	   	  if(ActiveCal == CalendarID) then
+   	   	    var UserID: Nat, CalID: Nat, MemoID: Nat in
+   	   	      ViewMemoReceive(?UserID, ?CalID, ?MemoID) where ((member(UserID, ListOfUID) == true) and 
+   	   	                                                      (CalID == CalendarID));
+   	   	      var CurrentList: ListOfMemo, 
+			  CurrentMemo: Memo, 
+			  MemoExists: bool in
+			  CurrentList := ListOfM;
+			  MemoExists := false;
+			  
+			  -- this confirms if memo that wants to be viewed exists
+			  while (empty(CurrentList) == false) loop
+			    CurrentMemo := head(CurrentList);
+			    if(CurrentMemo.ID == MemoID) then
+			      MemoExists := true
+			    end if;
+			    CurrentList := tail(CurrentList)
+			  end loop;
+			  
+			  -- the existing memo can be displayed
+			  if(MemoExists == true) then
+			    DisplayMemo(UserID, CalID, MemoID)
+			  end if
+			end var        
+   	   	    end var
+   	   	  end if
+   	   	end if
+   	   	[]
+   	   	  if (ActiveCal != 0) then
+   	   	    if(ActiveCal == CalendarID) then
+   	   	      var UserID: Nat, CalID: Nat, MemoID: Nat in
+   	   	        ViewActivityReceive(?UserID, ?CalID) where ((member(UserID, ListOfUID) == true) and 
+   	   	                                                    (CalID == CalendarID));
+   	   	        DisplayActivity(UserID, CalID, ListOfA)
+   	   	      end var
+   	   	    end if
+   	   	  end if	 	
+   	      end select
+    	  end loop
+      	end var
+    end process
+    
+   --------------------------------------------------------------------------------------------
+   -- User is a process that models the capabilities of TimeTree app users. 
+   -- 
+   -- A user is able to create, delete, update and comment on events and memos in calendars 
+   -- that they are a member of. They can also view events, memos as well as activities and
+   -- calendars. They can search for events as well as receive notifications if it is sent 
+   -- to their UserID
+   -- 
+   -- They can request to invite or join a calendar and chat with other members and activities 
+   -- and performs actions such as . It also allows users to send invites and join or leave a 
+   -- calendar as well as chat with each other.
+   --
+   -- Although users are synchronized on their gates, they verify and access actions that
+   -- contain their own IDs.
+   --------------------------------------------------------------------------------------------
+ 
+  
+    process User[SignUp, SignIn, SignOut: N,
+   	  	 CreateCalendar: N2, DeleteCalendar: N2, RemovedFromCalendarReceive: N2,
+   	  	 InviteToCalendar: N3, InviteLinkToCalendarReceive: N2,
+   	  	 JoinCalendar: N2, LeaveCalendar: N2,
+   	  	 Chat: N3,
+   	  	 ViewCalendar: N2, DisplayCalendarReceive: N2,
+   	  	 CalendarNotifyReceive: N3,
+   	  	 AddedToCalendarReceive: N2,
+   	  	 Search: N3, ResultReceive: N2E,
+   	  	 CreateEvent: N2E, DeleteEvent: N3,
+   	  	 ChangeEventDateAndTime: N2E,
+   	  	 CommentOnEvent: N3M,
+   	  	 ViewEvent: N3, DisplayEventReceive: N2E,
+   	  	 EventNotifyReceive: NMNMN,
+   	  	 CreateMemo: N3, DeleteMemo: N3,
+	   	 CommentOnMemo: N3M, UpdateMemo: N3,
+	   	 ViewMemo: N3, DisplayMemoReceive: N3,
+   	  	 MemoNotifyReceive: N3, Debug: any,
+   	  	 ViewActivity: N2, DisplayActivityReceive: N2L] 
+   	  	                                      (UserID: Nat, in var 
+   	  	                                       ListOfCalID: ListOfCalendarID, in var
+   	  	                                       ListOfInvitedCalID: ListOfCalendarID, in var
+   	  	                                       invitesLeftToSend: Nat, in var
+   	  	                                       invitesLeftToGet: Nat, in var
+						       nbUpdatesPerMemoLeft: Nat --, in var
+   	  	                                       --nbSearchesLeft: Nat, in var
+   	  	                                       --nbChatsLeft: Nat, in var
+						       --nbViewCalsLeft: Nat, in var
+						       --nbMemoLeftToCreate: Nat--, in var
+   	  	                                       --nbCreateEventsLeft: Nat, in var
+   	  	                                       --nbChangeEventsLeft: Nat,in var
+   	  	                                       --nbCommentEventsLeft: Nat, in var
+						       --nbViewEventsLeft: Nat
+						       ) is
+      var signedUp: bool, signedIn: bool, signedOut: bool, ActiveUser: Nat in
+      
+      -- user created in user manager essentially means the user is signed up & ultimately signed
+      -- in the TimeTree Application; create implies signed up which further implies signed in.
+      signedUp := false;
+      signedIn := false;
+      signedOut := false;
+      ActiveUser := 0;
+      loop
+    	select
+	    -- From User to none
+	      if (ActiveUser == 0)  then
+		if ((signedUp == false) and (signedIn == false) and (signedOut == false)) then
+		  SignUp(UserID);
+		  signedUp := true;
+		  signedIn := true;
+		  signedOut := false;
+		  ActiveUser := UserID
+		end if
+	      end if
+	    []
+	      if (ActiveUser == 0) then
+		if ((signedUp == true) and (signedIn == false) and (signedOut == false)) then
+		  SignIn(UserID);
+		  signedUp := true;
+		  signedIn := true;
+		  signedOut := false;
+		  ActiveUser := UserID
+		end if
+	      end if
+	    []
+	      if (ActiveUser != 0) then
+		if ((signedUp == true) and (signedIn == true) and (signedOut == false)) then
+		  SignOut(UserID);
+		  signedUp := true;
+		  signedIn := false;
+		  signedOut := true;
+		  ActiveUser := 0;
+		  select
+		    SignIn(UserID);
+		    signedUp := true;
+		    signedIn := true;
+		    signedOut := false;
+		    ActiveUser := UserID
+		  []
+		    null
+		  end select          
+		end if
+	      end if
+	    []
+    	-- ---------------------------------------------------------------------------------------
+    	-- From User to Calendar (Basic)
+      	if (signedIn == true) then
+	  if (ActiveUser == UserID) then
+	    var TVar: Nat in -- LINA: added a var
+	    -- TODO: create var to store calendar id to send when creating a calendar.
+	    TVar := any Nat where ((TVar > 0) and (TVar < 2) and (member(TVar, ListOfCalID) == false));
+	    -- TVar := any Nat where ((TVar == UserID) and (member(TVar, ListOfCalID) == false));
+	    CreateCalendar(ActiveUser, TVar);
+	    -- TODO: need to replace the 1 of Nat with the calendar id being added.
+	      if not (member(TVar, ListofCalID)) then -- Lina NEW: check if that is not already in the list
+	        ListofCalID := cons(TVar, ListofCalID)
+	      end if
+	    end var
+	  end if
+      	end if
+    	[]
+      	if (signedIn == true) then
+	  if (ActiveUser == UserID) then
+  	    var CalID: Nat, UID: Nat in
+  	    UID := ActiveUser;
+  	    -- CalID := UserID;
+    	    -- CalID := any Nat where (CalID == 1) or (CalID == 2);
+    	    CalID := any Nat where (CalID == 1);
+    	      if (member(CalID, ListOfCalID)) then
+   	        DeleteCalendar(UID, CalID)
+	      end if        	 
+  	    end var
+	  end if
+      	end if    			 
+    	[]
+    	if (signedIn == true) then
+	  if (ActiveUser == UserID) then
+	    var CalID: Nat, UID: Nat in
+	      RemovedFromCalendarReceive(?UID, ?CalID) where ((UID == UserID) and 
+	                                                      (member(CalID, ListOfCalID)));
+	      if (ActiveUser == UID) then
+		  var NewList: ListOfCalendarID,  
+		      CurrentList: ListOfCalendarID,
+		      CurrentID: Nat in
+		      NewList := {};
+		      CurrentList := ListOfCalID;
+		      CurrentID := 0;
+		      while (empty(CurrentList) == false) loop
+		        CurrentID := head(CurrentList);
+		        if (CurrentID != CalID) then
+		          NewList := cons(CurrentID, NewList)
+		        end if;
+		        CurrentList := tail(CurrentList)
+		      end loop;
+		      ListOfCalID := NewList
+	          end var
+	      end if 
+	    end var
+	  end if	  
+	end if
+    	[]
+      	if (signedIn == true) then
+	  if (ActiveUser == UserID) then
+	      var CalID: Nat, UID: Nat, InvitedUID: Nat in
+	          UID := ActiveUser;
+	          CalID := any Nat where ((member(CalID, ListOfCalID)) == true);	        
+	          -- CalID := any Nat where (((CalID == 1) or (CalID == 2)) and ((member(CalID, ListOfCalID)) == true));
+	          InvitedUID := any Nat where (((InvitedUID == 1) or (InvitedUID == 2)) and (InvitedUID != UID));
+	          if(invitesLeftToSend > 0) then
+	            InviteToCalendar(UID, InvitedUID, CalID);
+	            invitesLeftToSend := invitesLeftToSend - 1
+	          end if
+	      end var
+	  end if
+      	end if      		
+    	[]
+          var CalID: Nat, UID: Nat in
+            InviteLinkToCalendarReceive(?UID, ?CalID) where 
+                                       ((UID == UserID) and 
+                                       ((member(CalID, ListOfCalID)) == false) and
+                                       ((CalID == 1) or (CalID == 2)) and
+                                       (invitesLeftToGet > 0));
+            ListOfInvitedCalID := cons(CalID, ListOfInvitedCalID);
+            invitesLeftToGet := invitesLeftToGet - 1
+        end var
+        []
+      	if (signedIn == true) then
+	  if (ActiveUser == UserID) then
+	    if(empty(ListOfInvitedCalID) == false) then
+	      var CalIDToJoin: Nat, UID: Nat in
+	          UID := ActiveUser;
+	          CalIDToJoin := any Nat where (member(CalIDToJoin, ListOfInvitedCalID));
+	          if(member(CalIDToJoin, ListOfCalID) == false) then
+	            JoinCalendar(UID, CalIDToJoin)
+	          end if
+	      end var
+	    end if
+	  end if
+      	end if
+    	[]
+      	if (signedIn == true) then
+          if (ActiveUser == UserID) then
+            var UID: Nat, CalIDToLeave: Nat in
+              UID := ActiveUser;
+              CalIDToLeave := any Nat where (member(CalIDToLeave, ListOfCalID));
+              LeaveCalendar(UID, CalIDToLeave)        
+            end var
+          end if
+      	end if
+    	[]
+      	if (signedIn == true) then
+          if (ActiveUser == UserID) then --and (nbChatsLeft > 0)) then
+            var UID: Nat, CalID: Nat, MessageContent: Nat in
+                UID := ActiveUser;
+                CalID := any Nat where (member(CalID, ListOfCalID));
+                MessageContent := UID;
+                Chat(UID, CalID, MessageContent)
+		--nbChatsLeft := nbChatsLeft - 1
+            end var
+          end if
+      	end if
+    	[]
+      	if (signedIn == true) then
+          if (ActiveUser == UserID) then --and (nbViewCalsLeft > 0))then
+            var UID: Nat, CalID: Nat in
+                UID := ActiveUser;
+                CalID := any Nat where (member(CalID, ListOfCalID));
+                ViewCalendar(UID, CalID)
+		--nbViewCalsLeft := nbViewCalsLeft - 1
+            end var
+          end if
+      	end if
+    	[]
+    	-- -------------------------------------------------------------------
+    	-- From Calendar to User (Basic)
+      	if (signedIn == true) then
+          if (ActiveUser == UserID) then
+            var UID: Nat, CalID: Nat in
+              DisplayCalendarReceive(?UID, ?CalID) where ((UID == UserID) and (member(CalID, ListOfCalID) == true))
+            end var
+          end if
+      	end if
+    	[]
+      	if (signedIn == true) then
+          if (ActiveUser == UserID) then
+            var UID: Nat, CalID: Nat, NotifcationContent: Nat in
+              CalendarNotifyReceive(?UID, ?CalID, ?NotifcationContent) where ((UID == UserID) and 
+                                                                             (member(CalID, ListOfCalID) == true))
+            end var
+          end if
+      	end if
+    	[]
+      	if (signedIn == true) then
+          if (ActiveUser == UserID) then
+            var UID: Nat, CalID: Nat in
+              AddedToCalendarReceive(?UID, ?CalID) where ((UID == UserID) and 
+                                                         ((member(CalID, ListOfCalID)) == false) and
+                                                         ((member(CalID, ListOfInvitedCalID)) == true));
+                if (ActiveUser == UID) then
+		  var NewList: ListOfCalendarID,  
+		      CurrentList: ListOfCalendarID,
+		      CurrentID: Nat in
+		      NewList := {};
+		      CurrentList := ListOfInvitedCalID;
+		      CurrentID := 0;
+		      while (empty(CurrentList) == false) loop
+		        CurrentID := head(CurrentList);
+		        if (CurrentID != CalID) then
+		          NewList := cons(CurrentID, NewList)
+		        end if;
+		        CurrentList := tail(CurrentList)
+		      end loop;
+		      ListOfInvitedCalID := NewList;
+		      ListofCalID := cons(CalID, ListofCalID)
+	          end var
+	      end if                                                                
+            end var
+          end if
+      	end if
+    	[]
+          if (signedIn == true) then
+            if (ActiveUser == UserID) then
+              var UID: Nat, CalID: Nat, EventID: Nat in
+                UID := ActiveUser;
+                CalID := any Nat where (member(CalID, ListOfCalID));
+                EventID := any Nat where ((EventID > 0) and (EventID < 2));
+                --if(nbSearchesLeft > 0) then
+                  Search(UID, CalID, EventID)
+                  --nbSearchesLeft := nbSearchesLeft - 1
+                --end if
+              end var
+            end if
+      	  end if
+    	[]
+     	if (signedIn == true) then
+          if (ActiveUser == UserID) then
+            var UID: Nat, CalID: Nat, Event: Event in
+              ResultReceive(?UID, ?CalID, ?Event) where ((UID == UserID) and (member(CalID, ListOfCalID) == true))
+            end var
+          end if
+      	end if
+    	[]
+    	-- -------------------------------------------------------------------
+    	-- -------------------------------------------------------------------
+    	-- -------------------------------------------------------------------
+    	-- From User to Calendar (Event)
+      	if (signedIn == true) then
+        	if (ActiveUser == UserID) then --and (nbCreateEventsLeft > 0)) then
+		 var UID: Nat, CalID: Nat, EventID: Nat, newEvent: Event in
+                   UID := ActiveUser;
+                   CalID := any Nat where (member(CalID, ListOfCalID) == true);
+                   EventID := any Nat where ((EventID > 0) and (EventID < 2));
+		   newEvent := Event(EventID, 0, 0, 0, 0);
+          	   CreateEvent(UID, CalID, newEvent)
+		   --nbCreateEventsLeft := nbCreateEventsLeft - 1
+		 end var
+        	end if
+      	end if
+    	[]
+      	if (signedIn == true) then
+		if (ActiveUser == UserID) then
+        	var UID: Nat, CalID: Nat, EventID: Nat in
+                   UID := ActiveUser;
+                   CalID := any Nat where (member(CalID, ListOfCalID) == true);
+                   EventID := any Nat where ((EventID > 0) and (EventID < 2));
+          	   DeleteEvent(UID, CalID, EventID)
+		 end var
+   		end if
+      	end if
+    	[]
+      	if (signedIn == true) then
+        	if (ActiveUser == UserID) then --and (nbChangeEventsLeft > 0))then
+		  var UID: Nat, CalID: Nat, EventID: Nat, date: Nat, year: Nat, hour: Nat, min: Nat, newEvent: Event in
+                   UID := ActiveUser;
+                   CalID := any Nat where (member(CalID, ListOfCalID) == true);
+                   EventID := any Nat where ((EventID > 0) and (EventID < 2));
+		   date := any Nat where ((date > 12) and (date < 14));
+		   year := any Nat where ((year > 23) and (year < 25));
+		   hour := any Nat where ((hour > 7) and (hour < 9));
+		   min := any Nat where ((min == 15) );
+
+		   newEvent := Event(EventId, date, year, hour, min);
+
+          	   ChangeEventDateAndTime(UID, CalID, newEvent)
+		   --nbChangeEventsLeft := nbChangeEventsLeft - 1
+
+		  end var
+        	end if
+      	end if
+    	[]
+      	if (signedIn == true) then
+        	if (ActiveUser == UserID) then --and (nbCommentEventsLeft > 0)) then
+		 var UID: Nat, CalID: Nat, EventID: Nat, comment: string in
+                   UID := ActiveUser;
+                   CalID := any Nat where (member(CalID, ListOfCalID) == true);
+                   EventID := any Nat where ((EventID > 0) and (EventID < 2));
+		   comment := string(EventID);
+          	   CommentOnEvent(UID, CalID, EventID, comment)
+		 end var
+
+		--nbCommentEventsLeft := nbCommentEventsLeft - 1
+        	end if
+      	end if
+    	[]
+      	if (signedIn == true) then
+        	if (ActiveUser == UserID) then --and (nbViewEventsLeft > 0 )) then
+		 var UID: Nat, CalID: Nat, EventID: Nat, comment: string in
+                   UID := ActiveUser;
+                   CalID := any Nat where (member(CalID, ListOfCalID) == true);
+                   EventID := any Nat where ((EventID > 0) and (EventID < 2));
+          	   ViewEvent(UID, CalID, EventID)
+		   --nbViewEventsLeft := nbViewEventsLeft - 1
+		 end var
+        	end if
+      	end if
+    	[]
+    	-- -------------------------------------------------------------------
+    	-- From Calendar to User (Event)
+      	if (signedIn == true) then
+        	if (ActiveUser == UserID) then
+		  var UID: Nat, CalID: Nat, newEvent: Event in
+          	  DisplayEventReceive(?UID, ?CalID, ?newEvent) where ((UID ==  UserID) and 
+								     (member(CalID, ListOfCalID) == true))
+		  end var        	
+		end if
+      	end if
+    	[]
+      	if (signedIn == true) then
+        	if (ActiveUser == UserID) then
+		var UID: Nat, otherUser: Nat, CalID: Nat, notification1, notification2: string in
+          	  EventNotifyReceive(?UID, ?notification1, ?otherUser, ?notification2,  ?CalID) where ((UID ==  UserID) and 
+								     (member(CalID, ListOfCalID) == true))
+		  end var 
+        	end if
+      	end if
+    	[]
+    	-- -------------------------------------------------------------------
+    	-- -------------------------------------------------------------------
+    	-- -------------------------------------------------------------------
+    	-- From User to Calendar (Memo)
+      	if (signedIn == true) then
+          if (ActiveUser == UserID) then
+            var UID: Nat, CalID: Nat, MemoID: Nat in
+              UID := ActiveUser;
+              CalID := any Nat where (member(CalID, ListOfCalID));
+              MemoID := any Nat where ((MemoID == 1));
+              --if (nbMemoLeftToCreate > 0) then
+                CreateMemo(UID, CalID, MemoID)
+                -- nbMemoLeftToCreate := nbMemoLeftToCreate - 1
+              --end if
+            end var
+          end if
+      	end if
+    	[]
+      	if (signedIn == true) then
+          if (ActiveUser == UserID) then
+            var UID: Nat, CalID: Nat, MemoID: Nat in
+              UID := ActiveUser;
+              CalID := any Nat where (member(CalID, ListOfCalID));
+              MemoID := any Nat where ((MemoID == 1) );
+              DeleteMemo(UID, CalID, MemoID)
+            end var
+          end if
+      	end if
+    	[]
+      	if (signedIn == true) then
+          if (ActiveUser == UserID) then
+             var UID: Nat, CalID: Nat, MemoID: Nat, CommentContent: String in
+               UID := ActiveUser;
+               CalID := any Nat where (member(CalID, ListOfCalID));
+               MemoID := any Nat where ((MemoID == 1) );
+               CommentContent := String(MemoID);
+               CommentOnMemo(UID, CalID, MemoID, CommentContent)
+             end var
+          end if
+      	end if
+    	[]
+      	if (signedIn == true) then
+          if (ActiveUser == UserID) then --and (nbUpdatesPerMemoLeft > 0)) then
+            var UID: Nat, CalID: Nat, MemoID: Nat in
+               UID := ActiveUser;
+               CalID := any Nat where (member(CalID, ListOfCalID));
+               MemoID := any Nat where ((MemoID == 1) );
+               UpdateMemo(UID, CalID, MemoID)
+               --nbUpdatesPerMemoLeft := nbUpdatesPerMemoLeft - 1
+             end var
+          end if
+      	end if
+    	[]
+      	if (signedIn == true) then
+          if (ActiveUser == UserID) then
+            var UID: Nat, CalID: Nat, MemoID: Nat in
+              UID := ActiveUser;
+              CalID := any Nat where (member(CalID, ListOfCalID));
+              MemoID := any Nat where ((MemoID == 1) );
+              ViewMemo(UID, CalID, MemoID)
+            end var
+          end if
+      	end if
+    	[]
+    	-- -------------------------------------------------------------------
+    	-- From Calendar to User (Memo)
+      	if (signedIn == true) then
+          if (ActiveUser == UserID) then
+            var UID: Nat, CalID: Nat, MemoID: Nat in
+              DisplayMemoReceive(?UID, ?CalID, ?MemoID) where ((UID == UserID) and (member(CalID, ListOfCalID) == true))
+            end var
+          end if
+      	end if
+    	[]
+      	if (signedIn == true) then
+          if (ActiveUser == UserID) then
+            var UID: Nat, CalID: Nat, NotifcationContent: Nat in
+              MemoNotifyReceive(?UID, ?CalID, ?NotifcationContent) where 
+                               ((UID == UserID) and (member(CalID, ListOfCalID) == true))
+	    end var
+          end if
+      	end if
+      	[]
+      	if (signedIn == true) then
+          if (ActiveUser == UserID) then
+            var UID: Nat, CalID: Nat in
+            UID := ActiveUser;
+            CalID := any Nat where (member(CalID, ListOfCalID));
+            ViewActivity(UID, CalID)
+	    end var
+          end if
+      	end if
+      	[]
+      	if (signedIn == true) then
+          if (ActiveUser == UserID) then
+            var UID: Nat, CalID: Nat, ListOfA: ListOfActivity in
+              DisplayActivityReceive(?UID, ?CalID, ?ListOfA) where ((UID == UserID) and (member(CalID, ListOfCalID) == true))
+	    end var
+          end if
+      	end if
+    	end select
+      end loop
+      end var
+    end process
+
+
+   --------------------------------------------------------------------------------------------
+   -- The Main process models the calenedar-user interaction by synchronizing the UserManager 
+   -- process and the CalendarManager process thereby indirectly synchronizing the users with 
+   -- the calendars. 
+   -- 
+   -- The UserManager and CalendarManager processes are synchronized on their shared gates but 
+   -- not on those that are internal like SignIn, EventActivityUpdate etc.
+   --
+   --------------------------------------------------------------------------------------------
+ 
+    process Main[SignUp, SignIn, SignOut: N,
+             	 CalendarActivtyUpdate, EventActivityUpdate, MemoActivityUpdate: any,
+		 CreateCalendar: N2, DeleteCalendar: N2, RemovedFromCalendar: N2,
+		 InviteToCalendar: N3, InviteLinkToCalendar: N2,
+		 JoinCalendar: N2, LeaveCalendar: N2,
+		 Chat: N3,
+		 ViewCalendar: N2, DisplayCalendar: N2,
+		 CalendarNotify: N3,
+		 AddedToCalendar: N2,
+		 Search: N3, Result: N2E,
+		 CreateEvent: N2E, DeleteEvent: N3,
+		 ChangeEventDateAndTime: N2E,
+		 CommentOnEvent: N3M,
+		 ViewEvent: N3, DisplayEvent: N2E,
+		 EventNotify: NMNMN,
+		 CreateMemo: N3, DeleteMemo: N3,
+	   	 CommentOnMemo: N3M, UpdateMemo: N3,
+	   	 ViewMemo: N3, DisplayMemo: N3,
+	   	 MemoNotify: N3, Debug: any, 
+	   	 ViewActivity: N2, DisplayActivity: N2L] is
+      par
+   	 CreateCalendar, DeleteCalendar, RemovedFromCalendar,
+   	 InviteToCalendar, InviteLinkToCalendar,
+   	 JoinCalendar, LeaveCalendar,
+   	 Chat,
+   	 ViewCalendar, DisplayCalendar,
+   	 CalendarNotify,
+   	 AddedToCalendar,
+   	 Search, Result,
+   	 CreateEvent, DeleteEvent,
+   	 ChangeEventDateAndTime,
+   	 CommentOnEvent,
+   	 ViewEvent, DisplayEvent,
+   	 EventNotify,
+   	 CreateMemo, DeleteMemo,
+   	 CommentOnMemo, UpdateMemo,
+   	 ViewMemo, DisplayMemo,
+   	 MemoNotify,
+   	 ViewActivity, DisplayActivity in
+   		 
+     	UserManager [SignUp, SignIn, SignOut,
+   	       	     CreateCalendar, DeleteCalendar, RemovedFromCalendar,
+   	       	     InviteToCalendar, InviteLinkToCalendar, 
+   	       	     JoinCalendar, LeaveCalendar,
+   	       	     Chat,
+   		     ViewCalendar, DisplayCalendar,
+   	             CalendarNotify,
+                     AddedToCalendar,
+                     Search, Result,
+   		     CreateEvent, DeleteEvent,
+   		     ChangeEventDateAndTime,
+   		     CommentOnEvent,
+   		     ViewEvent, DisplayEvent,
+   		     EventNotify,
+   		     CreateMemo, DeleteMemo,
+   		     CommentOnMemo, UpdateMemo,
+   		     ViewMemo, DisplayMemo,
+   		     MemoNotify, Debug, 
+   		     ViewActivity, DisplayActivity]
+      ||
+    	CalendarManager [CalendarActivtyUpdate, EventActivityUpdate, MemoActivityUpdate,
+   	          	 CreateCalendar, DeleteCalendar, RemovedFromCalendar,
+   	          	 InviteToCalendar, InviteLinkToCalendar,
+   	          	 JoinCalendar, LeaveCalendar,
+   	          	 Chat,
+   	          	 ViewCalendar, DisplayCalendar,
+   	          	 CalendarNotify,
+   	          	 AddedToCalendar,
+   	          	 Search, Result,
+   		  	 CreateEvent, DeleteEvent,
+   		  	 ChangeEventDateAndTime,
+   		  	 CommentOnEvent,
+   		  	 ViewEvent, DisplayEvent,
+   		  	 EventNotify,
+   		  	 CreateMemo, DeleteMemo,
+   		  	 CommentOnMemo, UpdateMemo,
+   		  	 ViewMemo, DisplayMemo,
+   		  	 MemoNotify, Debug,
+   		  	 ViewActivity, DisplayActivity]
+      end par
+    end process
+end module
