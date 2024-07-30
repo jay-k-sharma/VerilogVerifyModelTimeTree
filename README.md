@@ -10,8 +10,8 @@ The repository is structured as follows:
 
 - **Verification_Modelling_TimeTree Report.pdf**: Detailed report on the verification and modeling process.
 - **ProjectSubmission/**: Directory containing the main submission files for the project.
-  - **verilog/**: Contains Verilog code for the verification.
-  - **lnt/**: Contains LNT models for the application.
+  - verilog/: Contains Verilog code for the verification.
+  - lnt/: Contains LNT models for the application.
 
 ## Getting Started
 To get started with this project, clone the repository using the following command:
