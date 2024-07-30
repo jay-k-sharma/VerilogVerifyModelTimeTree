@@ -2,15 +2,6 @@
 
 This repository contains the Verilog verification and LNT modeling of the Mobile TimeTree application.
 
-## Table of Contents
-- [Introduction](#introduction)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Dependencies](#dependencies)
-- [Running the Verification](#running-the-verification)
-- [Contributing](#contributing)
-- [License](#license)
-
 ## Introduction
 This project focuses on the verification of the Mobile TimeTree application using Verilog and LNT (LOTOS NT). The goal is to ensure the correctness and reliability of the application through rigorous verification processes.
 
